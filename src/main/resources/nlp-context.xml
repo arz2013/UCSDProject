@@ -1,0 +1,24 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+					       http://www.springframework.org/schema/beans/spring-beans.xsd
+					       http://www.springframework.org/schema/context
+					       http://www.springframework.org/schema/context/spring-context.xsd
+					       http://www.springframework.org/schema/data/neo4j
+					       http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd
+					       http://www.springframework.org/schema/tx
+     					   http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <neo4j:config graphDatabaseService="graphDatabaseService" base-package="edu.ucsd.model"/>
+    <neo4j:repositories base-package="edu.ucsd.repository"/>
+    <context:component-scan base-package="edu.ucsd.dao"/>
+    <tx:annotation-driven/>
+	<bean id="graphDatabaseService" 
+		  class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase">
+  		<constructor-arg index="0" value="http://localhost:7474/db/data" />
+	</bean>
+	<bean name="movieDao" class="edu.ucsd.dao.Neo4JMovieDaoImpl"/>
+	<bean name="sentenceDao" class="edu.ucsd.dao.Neo4JSentenceDaoImpl"/>
+</beans>

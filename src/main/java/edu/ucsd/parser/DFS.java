@@ -52,7 +52,7 @@ public class DFS {
 			Word word = Word.newWord(tree.value());
 			sentenceDao.save(word);
 			sentenceDao.save(new NonLeafToLeaf(parent, word));
-			System.out.println("Leaf: " + tree.value());
+			//System.out.println("Leaf: " + tree.value());
 			return;
 		} else {
 			sentenceDao.save(currentNode);
@@ -61,7 +61,7 @@ public class DFS {
 			} else {
 				sentenceDao.save(new ParseChild(parent, currentNode));
 			}
-			System.out.println("Non Leaf: " + tree.value());
+			// System.out.println("Non Leaf: " + tree.value());
 		}
 		
 		for(Tree child : children) {

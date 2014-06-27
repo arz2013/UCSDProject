@@ -86,7 +86,6 @@ public class Sentence {
 	}
 
 	public int countNumberOfWords() {
-		// TODO Auto-generated method stub
 		return this.words.size();
 	}
 }

@@ -1,29 +1,26 @@
 package edu.ucsd.model;
 
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Labels;
+import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
-
-import edu.ucsd.utils.LabelUtils;
+import org.springframework.data.neo4j.support.index.IndexType;
 
 @NodeEntity
+@TypeAlias("_Word")
 public class Word {
 	@GraphId
 	private Long id;
 	
+	@Indexed(indexType=IndexType.FULLTEXT, indexName = "wordtext")
 	private String text;
 	
-	private List<String> posTags;
+	private Set<String> partOfSpeechTags = new HashSet<String>();
 	
-	private List<String> neTags;
-	
-	@Labels
-	private Set<String> labels = new HashSet<String>();
+	private Set<String> nameEntityTags = new HashSet<String>();
 	
 	private Word() {	
 	}
@@ -34,7 +31,6 @@ public class Word {
 		}
 		Word newWord = new Word();
 		newWord.text = text;
-		newWord.addLabel(newWord.getClass().getSimpleName());
 		
 		return newWord;
 	}
@@ -43,13 +39,15 @@ public class Word {
 		return this.text;
 	}
 	
-	public Set<String> getLabels() {
-		return Collections.unmodifiableSet(this.labels);
+	public void addPosTag(String posTag) {
+		if (posTag != null) {
+			partOfSpeechTags.add(posTag);
+		}
 	}
-
-	public void addLabel(String label) {
-		if (label != null) {
-			labels.add(LabelUtils.createLabel(label));
+	
+	public void addNameEntityTag(String neTag) {
+		if (neTag != null) {
+			nameEntityTags.add(neTag);
 		}
 	}
 

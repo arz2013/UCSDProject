@@ -15,6 +15,7 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -88,12 +89,6 @@ public class StanfordParser2 {
 
 		List<String> disneyFinancialStatement = readDisneyFinancialStatement();
 
-		// Maintain a list of words that has already been seen
-		Map<String, Word> seenWords = new HashMap<String, Word>();
-		Word root = Word.newWord("ROOT");
-		sentenceDao.save(root);
-		seenWords.put(root.getText(), root);
-
 		for(String text : disneyFinancialStatement ) {
 			// create an empty Annotation just with the given text
 			Annotation document = new Annotation(text);
@@ -106,6 +101,12 @@ public class StanfordParser2 {
 			List<CoreMap> sentences = document.get(SentencesAnnotation.class);
 
 			for(CoreMap sentence: sentences) {
+				// Maintain a list of words that has already been seen
+				Map<String, Word> seenWords = new HashMap<String, Word>();
+				Word root = Word.newWord("ROOT");
+				sentenceDao.save(root);
+				seenWords.put(root.getText(), root);
+
 				// traversing the words in the current sentence
 				// a CoreLabel is a CoreMap with additional token-specific methods
 				Sentence newSentence = Sentence.newSentence(text);
@@ -123,13 +124,11 @@ public class StanfordParser2 {
 						seenWord = Word.newWord(word);
 						seenWords.put(word, seenWord);
 					}
-					seenWord.addLabel(LabelUtils.labelPOS(pos));
-					seenWord.addLabel(LabelUtils.labelNE(ne));
+					seenWord.addPosTag(pos);
+					seenWord.addNameEntityTag(ne);
 					sentenceDao.save(seenWord);
 					newSentence.addWord(seenWord);
 				}
-
-				// System.out.println("Number of words: " + newSentence.countNumberOfWords());
 
 				sentenceDao.save(newSentence);
 
@@ -141,16 +140,15 @@ public class StanfordParser2 {
 				GrammaticalStructure gs = gsf.newGrammaticalStructure(tree);
 				Collection<TypedDependency> tds = gs.typedDependenciesCollapsed();
 				for(TypedDependency td : tds) {
-					/*
-					System.out.println(td);
-					System.out.println(td.reln().getLongName());
-					System.out.println(td.gov().nodeString());
-					System.out.println("Dependency Name: " + td.dep().nodeString() +  " Node: " + td.reln());
-					*/
 					WordToWordDependency dependency = new WordToWordDependency(seenWords.get(td.gov().nodeString()), seenWords.get(td.dep().nodeString()), td.reln().toString());
 					sentenceDao.save(dependency);
 				}
-				// System.out.println("Number of dependencies: " + tds.size());
+				
+				// Now save the parse trees as well
+				DFS dfs = new DFS(sentenceDao, newSentence, new HashSet<Word>());
+				dfs.performDepthFirstTraversal(tree);
+				
+				seenWords.clear();
 			}
 		}
 		stopWatch.stop();

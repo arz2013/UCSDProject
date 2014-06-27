@@ -2,6 +2,7 @@ package edu.ucsd.model;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.neo4j.annotation.GraphId;
@@ -16,6 +17,10 @@ public class Word {
 	private Long id;
 	
 	private String text;
+	
+	private List<String> posTags;
+	
+	private List<String> neTags;
 	
 	@Labels
 	private Set<String> labels = new HashSet<String>();

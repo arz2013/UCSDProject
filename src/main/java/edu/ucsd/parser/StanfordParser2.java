@@ -5,6 +5,7 @@ import edu.ucsd.model.Sentence;
 import edu.ucsd.model.Word;
 import edu.ucsd.model.WordToWordDependency;
 import edu.ucsd.system.SystemApplicationContext;
+import edu.ucsd.utils.LabelUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -122,8 +123,8 @@ public class StanfordParser2 {
 						seenWord = Word.newWord(word);
 						seenWords.put(word, seenWord);
 					}
-					seenWord.addLabel(pos);
-					seenWord.addLabel(ne);
+					seenWord.addLabel(LabelUtils.labelPOS(pos));
+					seenWord.addLabel(LabelUtils.labelNE(ne));
 					sentenceDao.save(seenWord);
 					newSentence.addWord(seenWord);
 				}
@@ -153,6 +154,6 @@ public class StanfordParser2 {
 			}
 		}
 		stopWatch.stop();
-		stopWatch.prettyPrint();
+		System.out.println(stopWatch.prettyPrint());
 	}
 }

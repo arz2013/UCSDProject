@@ -3,7 +3,6 @@ package edu.ucsd.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Labels;
 import org.springframework.data.neo4j.annotation.NodeEntity;

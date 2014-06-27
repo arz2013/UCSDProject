@@ -33,8 +33,8 @@ public class StanfordParser3 {
 	    StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 	    
 	    // read some text in the text variable
-	    String text = "The strongest rain ever recorded in India shut down the financial hub of Mumbai, snapped communication lines, closed airports and forced thousands of people to sleep in their offices or walk home during the night, officials said today. Therefore a state of emergency has been declared.";
-	    
+	    // String text = "The strongest rain ever recorded in India shut down the financial hub of Mumbai, snapped communication lines, closed airports and forced thousands of people to sleep in their offices or walk home during the night, officials said today. Therefore a state of emergency has been declared.";
+	    String text = "My dog also likes eating sausage.";
 	    // create an empty Annotation just with the given text
 	    Annotation document = new Annotation(text);
 	    

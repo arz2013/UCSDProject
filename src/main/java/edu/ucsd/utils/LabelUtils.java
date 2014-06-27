@@ -6,4 +6,12 @@ public abstract class LabelUtils {
 	public static String createLabel(String userSuppliedLabel) {
 		return LABELSTRATEGY_PREFIX + userSuppliedLabel;
 	}
+	
+	public static String labelPOS(String posInformation) {
+		return "POS{" + posInformation + "}";
+	}
+	
+	public static String labelNE(String neInformation) {
+		return "NE{" + neInformation + "}";
+	}
 }

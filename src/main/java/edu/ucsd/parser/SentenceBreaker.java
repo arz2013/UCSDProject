@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class SentenceBreaker {
 
@@ -28,6 +29,8 @@ public class SentenceBreaker {
 			sb.append(inputLine);
 		}
 		
+		List<String> words = new ArrayList<String>();
+		
 		int count = 0;
 		
 		// String paragraph = "I'm going to eat something. But I don't know what yet.";
@@ -45,6 +48,10 @@ public class SentenceBreaker {
 	    		  previous = previous.concat(text);
 	    		  sentences.set(count - 1, previous);
 	    	  } else {
+	    		  StringTokenizer tokenizer = new StringTokenizer(text);
+	    		  while(tokenizer.hasMoreTokens()) {
+	    			  words.add(tokenizer.nextToken());
+	    		  }
 	    		  sentences.add(text);
 	    		  count++;
 	    	  }
@@ -57,6 +64,7 @@ public class SentenceBreaker {
 	    }
 	    
 	    System.out.println("Total number of sentences: " + count);
+	    System.out.println("Number of words: " + words.size());
 	}
 
 }

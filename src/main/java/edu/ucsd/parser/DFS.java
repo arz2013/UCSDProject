@@ -1,6 +1,7 @@
 package edu.ucsd.parser;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ public class DFS {
 	private SentenceDao sentenceDao;
 	private Sentence sentence;
 	private Set<Word> seenWords;
+	private List<String> inOrder = new ArrayList<String>();
 	
 	public DFS(SentenceDao sentenceDao, Sentence sentence, Set<Word> seenWords) {
 		if(sentenceDao == null) {
@@ -50,9 +52,11 @@ public class DFS {
 		
 		if(tree.isLeaf()) {
 			Word word = Word.newWord(tree.value());
+			//System.out.println("Word : " + tree.value() + " Score: " + tree.score());
 			sentenceDao.save(word);
 			sentenceDao.save(new NonLeafToLeaf(parent, word));
 			//System.out.println("Leaf: " + tree.value());
+			inOrder.add(tree.value());
 			return;
 		} else {
 			sentenceDao.save(currentNode);

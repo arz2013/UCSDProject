@@ -88,7 +88,7 @@ public class StanfordParser2 {
 		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
 		List<String> disneyFinancialStatement = readDisneyFinancialStatement();
-
+		
 		for(String text : disneyFinancialStatement ) {
 			// create an empty Annotation just with the given text
 			Annotation document = new Annotation(text);

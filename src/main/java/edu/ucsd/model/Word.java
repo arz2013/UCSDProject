@@ -1,8 +1,5 @@
 package edu.ucsd.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Indexed;
@@ -67,7 +64,13 @@ public class Word {
 			this.neTag = neTag;
 		}
 	}
-	
+		
+	@Override
+	public String toString() {
+		return "Word [text=" + text + ", position=" + position + ", posTag="
+				+ posTag + ", neTag=" + neTag + "]";
+	}
+
 	public static class TextAndPosition {
 		private String text;
 		private int position;

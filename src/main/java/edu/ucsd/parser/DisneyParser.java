@@ -10,6 +10,9 @@ import edu.stanford.nlp.ling.CoreAnnotations.IndexAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.trees.GrammaticalStructure;
@@ -57,17 +60,42 @@ public class DisneyParser {
 			// these are all the sentences in this document
 			// a CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 			List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-
+		
 			for(CoreMap sentence: sentences) {
+				int wordIndex = 0; 
+
 				// Maintain a list of words that has already been seen
 				Map<Word.TextAndPosition, Word> seenWords = new HashMap<Word.TextAndPosition, Word>();
-				Word root = Word.newWord("ROOT", 0);
+				Word root = Word.newWord("ROOT", wordIndex);
+				wordIndex++;
+				
 				sentenceDao.save(root);
 				seenWords.put(root.getTextAndPosition(), root);
+				
+				Sentence newSentence = Sentence.newSentence(text, noSentence);
+				
+				for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
+					// this is the text of the token
+					String word = token.get(TextAnnotation.class);
+					// this is the POS tag of the token
+					String pos = token.get(PartOfSpeechAnnotation.class);
+					// this is the NER label of the token
+					String ne = token.get(NamedEntityTagAnnotation.class);
+					
+					Word newWord = Word.newWord(word, wordIndex);
+					newWord.setNameEntityTag(ne);
+					newWord.setPosTag(pos);
+					sentenceDao.save(newWord);
+					
+					seenWords.put(newWord.getTextAndPosition(), newWord);
+					
+					newSentence.addWord(newWord);
+					
+					wordIndex++;
+				}
 
 				// traversing the words in the current sentence
 				// a CoreLabel is a CoreMap with additional token-specific methods
-				Sentence newSentence = Sentence.newSentence(text, noSentence);
 				sentenceDao.save(newSentence);
 
 				// this is the parse tree of the current sentence
@@ -79,8 +107,8 @@ public class DisneyParser {
 				Collection<TypedDependency> tds = gs.typedDependenciesCollapsed();
 				for(TypedDependency td : tds) {
 					// Check for existence of words
-					Word startWord = getOrCreateWord(td.gov(), seenWords);
-					Word endWord = getOrCreateWord(td.dep(), seenWords);
+					Word startWord = getWord(td.gov(), seenWords);
+					Word endWord = getWord(td.dep(), seenWords);
 					
 					WordToWordDependency dependency = new WordToWordDependency(startWord, endWord, td.reln().toString());
 					sentenceDao.save(dependency);
@@ -96,19 +124,9 @@ public class DisneyParser {
 		}
 	}
 	
-	private Word getOrCreateWord(TreeGraphNode node, Map<Word.TextAndPosition, Word> seenWords) {
+	private Word getWord(TreeGraphNode node, Map<Word.TextAndPosition, Word> seenWords) {
 		Word word = Word.newWord(node.nodeString(), node.label().get(IndexAnnotation.class));
-		
-		if(!seenWords.containsKey(word.getTextAndPosition())) {
-			word.setPosTag(node.label().get(PartOfSpeechAnnotation.class));
-			word.setNameEntityTag(node.label().get(NamedEntityTagAnnotation.class));
-			sentenceDao.save(word);
-			seenWords.put(word.getTextAndPosition(), word);
-		} else {
-			word = seenWords.get(word.getTextAndPosition());
-		}
-		
-		return word;
+		return seenWords.get(word.getTextAndPosition());
 	}
 	
 }

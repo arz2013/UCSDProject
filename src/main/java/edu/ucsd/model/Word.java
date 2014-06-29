@@ -18,19 +18,28 @@ public class Word {
 	@Indexed(indexType=IndexType.FULLTEXT, indexName = "wordtext")
 	private String text;
 	
-	private Set<String> partOfSpeechTags = new HashSet<String>();
+	private int position = -1;
 	
-	private Set<String> nameEntityTags = new HashSet<String>();
+	@Indexed(indexType=IndexType.FULLTEXT, indexName = "pos")
+	private String posTag;
+	
+	private String neTag;
 	
 	private Word() {	
 	}
 	
-	public static Word newWord(String text) {
+	public static Word newWord(String text, int position) {
 		if(text == null) {
-			new IllegalArgumentException("A sentence cannot be empty.");
+			throw new IllegalArgumentException("A sentence cannot be empty.");
 		}
+		
+		if(position < 0) {
+			throw new IllegalArgumentException("Word position can not be less than zero.");
+		}
+		
 		Word newWord = new Word();
 		newWord.text = text;
+		newWord.position = position;
 		
 		return newWord;
 	}
@@ -39,40 +48,78 @@ public class Word {
 		return this.text;
 	}
 	
-	public void addPosTag(String posTag) {
+	public int getPosition() {
+		return this.position;
+	}
+	
+	public TextAndPosition getTextAndPosition() {
+		return new TextAndPosition(getText(), getPosition());
+	}
+	
+	public void setPosTag(String posTag) {
 		if (posTag != null) {
-			partOfSpeechTags.add(posTag);
+			this.posTag = posTag;
 		}
 	}
 	
-	public void addNameEntityTag(String neTag) {
+	public void setNameEntityTag(String neTag) {
 		if (neTag != null) {
-			nameEntityTags.add(neTag);
+			this.neTag = neTag;
 		}
 	}
+	
+	public static class TextAndPosition {
+		private String text;
+		private int position;
+		
+		public TextAndPosition(String text, int position) {
+			super();
+			if(text == null) {
+				throw new IllegalArgumentException("Text can not be null");
+			}
+			
+			if(position < 0) {
+				throw new IllegalArgumentException("Position can't be less than zero.");
+			}
+			this.text = text;
+			this.position = position;
+		}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((text == null) ? 0 : text.hashCode());
-		return result;
-	}
+		public String getText() {
+			return text;
+		}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Word other = (Word) obj;
-		if (text == null) {
-			if (other.text != null)
+		public int getPosition() {
+			return position;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + position;
+			result = prime * result + ((text == null) ? 0 : text.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
 				return false;
-		} else if (!text.equals(other.text))
-			return false;
-		return true;
+			if (getClass() != obj.getClass())
+				return false;
+			TextAndPosition other = (TextAndPosition) obj;
+			if (position != other.position)
+				return false;
+			if (text == null) {
+				if (other.text != null)
+					return false;
+			} else if (!text.equals(other.text))
+				return false;
+			return true;
+		}
+		
 	}
 }

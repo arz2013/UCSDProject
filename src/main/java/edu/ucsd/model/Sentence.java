@@ -18,6 +18,8 @@ public class Sentence {
 	
 	private String text;
 	
+	private int sNum;
+	
 	@Labels
 	private Set<String> labels = new HashSet<String>();
 	
@@ -27,12 +29,18 @@ public class Sentence {
 	private Sentence() {	
 	}
 	
-	public static Sentence newSentence(String text) {
+	public static Sentence newSentence(String text, int sNum) {
 		if(text == null) {
-			new IllegalArgumentException("A sentence cannot be empty.");
+			throw new IllegalArgumentException("A sentence cannot be empty.");
 		}
+		
+		if(sNum < 0) {
+			throw new IllegalArgumentException("Sentence number can't be less than zero.");
+		}
+		
 		Sentence newSentence = new Sentence();
 		newSentence.text = text;
+		newSentence.sNum = sNum;
 		newSentence.addLabel(newSentence.getClass().getSimpleName());
 		
 		return newSentence;
@@ -40,6 +48,10 @@ public class Sentence {
 	
 	public String getText() {
 		return this.text;
+	}
+	
+	public int getSentenceNumber() {
+		return this.sNum;
 	}
 	
 	public Set<String> getLabels() {

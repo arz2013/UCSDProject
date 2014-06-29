@@ -1,6 +1,6 @@
 package edu.ucsd.parser;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -29,7 +29,7 @@ public class StanfordParseTree {
 		
 		String text = "My dog also likes eating sausage.";
 		
-		Sentence rawSentence = Sentence.newSentence(text);
+		Sentence rawSentence = Sentence.newSentence(text, 0);
 		sentenceDao.save(rawSentence);
 
 		// create an empty Annotation just with the given text
@@ -45,7 +45,8 @@ public class StanfordParseTree {
 		for(CoreMap sentence: sentences) {
 			// this is the parse tree of the current sentence
 	        Tree tree = sentence.get(TreeAnnotation.class);
-	        DFS dfs = new DFS(sentenceDao, rawSentence, new HashSet<Word>());
+	        // This will not work now since we are expecting the list of seen words
+	        DFS dfs = new DFS(sentenceDao, rawSentence, new HashMap<Word.TextAndPosition, Word>());
 	        dfs.performDepthFirstTraversal(tree);
 	        System.out.println("Name of the class: " + tree.getClass().getName());
 	        System.out.println(tree);

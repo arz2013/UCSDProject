@@ -9,6 +9,7 @@ import java.util.Properties;
 import org.springframework.context.ApplicationContext;
 
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.CoreAnnotations.IndexAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
@@ -58,6 +59,9 @@ public class StanfordParser3 {
 	          String pos = token.get(PartOfSpeechAnnotation.class);
 	          // this is the NER label of the token
 	          String ne = token.get(NamedEntityTagAnnotation.class);
+	          Integer index = token.get(IndexAnnotation.class); // THE INDEX IS NOT AVAILABLE HERE
+	          
+	          System.out.println("Word : " + word + " at token Index : " + index);
 	          
 	        }
 	        
@@ -68,7 +72,15 @@ public class StanfordParser3 {
 	        GrammaticalStructureFactory gsf = tlp.grammaticalStructureFactory();
 	        GrammaticalStructure gs = gsf.newGrammaticalStructure(tree);
 	        Collection<TypedDependency> tds = gs.typedDependenciesCollapsed();
-	       
+	        for(TypedDependency td : tds) {
+	        	System.out.println("Typed Dependency: " + td);
+	        	CoreLabel dep = td.dep().label();
+	        	int wordIndex = dep.get(IndexAnnotation.class);
+	        	CoreLabel gov = td.gov().label();
+	        	int wordIndex2 = gov.get(IndexAnnotation.class);
+	        	
+	        	System.out.println("Dep : " + dep.value() + " " + dep.get(TextAnnotation.class) + " " + dep.get(PartOfSpeechAnnotation.class) + " NE Tag : " + dep.get(NamedEntityTagAnnotation.class) + " Index: " + wordIndex + " Gov: " + gov.value() + " Index: " + wordIndex2);
+	        }
 	    }
 	}
 }

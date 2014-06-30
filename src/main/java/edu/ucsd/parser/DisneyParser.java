@@ -73,6 +73,7 @@ public class DisneyParser {
 				seenWords.put(root.getTextAndPosition(), root);
 				
 				Sentence newSentence = Sentence.newSentence(text, noSentence);
+				newSentence.addWord(root);
 				
 				for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
 					// this is the text of the token
@@ -104,7 +105,7 @@ public class DisneyParser {
 				TreebankLanguagePack tlp = new PennTreebankLanguagePack();
 				GrammaticalStructureFactory gsf = tlp.grammaticalStructureFactory();
 				GrammaticalStructure gs = gsf.newGrammaticalStructure(tree);
-				Collection<TypedDependency> tds = gs.typedDependenciesCollapsed();
+				Collection<TypedDependency> tds = gs.typedDependencies();
 				for(TypedDependency td : tds) {
 					// Check for existence of words
 					Word startWord = getWord(td.gov(), seenWords);

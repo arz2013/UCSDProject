@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.data.neo4j.annotation.Fetch;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Labels;
 import org.springframework.data.neo4j.annotation.NodeEntity;
@@ -23,6 +24,7 @@ public class Sentence {
 	@Labels
 	private Set<String> labels = new HashSet<String>();
 	
+	@Fetch
 	@RelatedToVia(type="HAS_WORD")
 	private Set<SentenceToWord> words = new HashSet<SentenceToWord>();
 	
@@ -70,6 +72,10 @@ public class Sentence {
 	
 	public void addWord(Word word) {
 		this.words.add(associateSentenceToWord(word));
+	}
+	
+	public Set<SentenceToWord> getSentenceToWords() {
+		return this.words;
 	}
 
 	@Override

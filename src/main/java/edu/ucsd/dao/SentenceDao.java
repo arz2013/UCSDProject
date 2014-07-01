@@ -1,5 +1,7 @@
 package edu.ucsd.dao;
 
+import java.util.List;
+
 import edu.ucsd.model.NonLeafParseNode;
 import edu.ucsd.model.NonLeafToLeaf;
 import edu.ucsd.model.ParseChild;
@@ -18,4 +20,7 @@ public interface SentenceDao {
 	public void save(ParseChild parseChild);
 	public void save(SentenceToRoot sentenceToRoot);
 	public void save(NonLeafToLeaf nonLeafToLeaf);
+	public Sentence getSentenceByText(String text);
+	public List<Word> getWordsBySentenceText(String text);
+	public String getRelationShip(Long startWordId, Long endWordId);
 }

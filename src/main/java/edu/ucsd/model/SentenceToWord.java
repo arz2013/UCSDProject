@@ -77,5 +77,4 @@ public class SentenceToWord {
 			return false;
 		return true;
 	}
-	
 }

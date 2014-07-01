@@ -48,6 +48,10 @@ public class Sentence {
 		return newSentence;
 	}
 	
+	public Long getId() {
+		return this.id;
+	}
+	
 	public String getText() {
 		return this.text;
 	}

@@ -42,7 +42,7 @@ public class SingleSentenceParseAndLoadTest {
 		text = "Looking back at everything we’ve accomplished this year, I am once again awed by the tremendous creativity and commitment of the men and women who make up The Walt Disney Company.";
 		text1 = "On behalf of everyone at Disney, I thank you for your continued support as we strive to create the next generation of fantastic family entertainment.";
 		List<String> disneyFinancialStatement = new ArrayList<String>();
-		// disneyFinancialStatement.add(text);
+		disneyFinancialStatement.add(text);
 		disneyFinancialStatement.add(text1);
 		DisneyParser parser = new DisneyParser(sentenceDao, disneyFinancialStatement);
 		parser.parseAndLoad();
@@ -50,7 +50,7 @@ public class SingleSentenceParseAndLoadTest {
 	
 	@Test
 	public void testParseAndLoad() {
-		//validateFirstSentence();
+		validateFirstSentence();
 		validateSecondSentence();
 	}
 	
@@ -73,7 +73,7 @@ public class SingleSentenceParseAndLoadTest {
 	
 	private void validateSecondSentence() {
 		Sentence sentence = sentenceDao.getSentenceByText(text1);
-		Assert.assertTrue(sentence.getSentenceNumber() == 0);
+		Assert.assertTrue(sentence.getSentenceNumber() == 1);
 		Assert.assertEquals(sentence.getText(), text1);
 		List<Word> words = sentenceDao.getWordsBySentenceText(text1);
 		Assert.assertEquals(28, words.size());

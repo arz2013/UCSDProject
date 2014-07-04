@@ -19,6 +19,5 @@
 		  class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase">
   		<constructor-arg index="0" value="http://localhost:7474/db/data" />
 	</bean>
-	<bean name="movieDao" class="edu.ucsd.dao.Neo4JMovieDaoImpl"/>
 	<bean name="sentenceDao" class="edu.ucsd.dao.Neo4JSentenceDaoImpl"/>
 </beans>

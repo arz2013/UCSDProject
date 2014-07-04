@@ -18,6 +18,5 @@
 	<bean id="graphDatabaseService" 
 		  class="org.neo4j.test.ImpermanentGraphDatabase" destroy-method="shutdown">
 	</bean>
-	<bean name="movieDao" class="edu.ucsd.dao.Neo4JMovieDaoImpl"/>
 	<bean name="sentenceDao" class="edu.ucsd.dao.Neo4JSentenceDaoImpl"/>
 </beans>

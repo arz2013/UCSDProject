@@ -6,7 +6,7 @@ import org.springframework.data.neo4j.annotation.RelationshipEntity;
 import org.springframework.data.neo4j.annotation.StartNode;
 
 @RelationshipEntity(type="HAS_PARSE_CHILD")
-public class SentenceToRoot {
+public class SentenceToNonLeafParseNode {
 	@GraphId
 	private Long id; 
 	
@@ -14,21 +14,21 @@ public class SentenceToRoot {
     private Sentence sentence;
     
     @EndNode
-    private NonLeafParseNode root;
+    private NonLeafParseNode parseNode;
     
-    private SentenceToRoot() {
+    private SentenceToNonLeafParseNode() {
     }
     
-    public SentenceToRoot(Sentence sentence, NonLeafParseNode root) {
+    public SentenceToNonLeafParseNode(Sentence sentence, NonLeafParseNode parseNode) {
     	if (sentence == null) {
     		throw new IllegalArgumentException("Sentence can not be null.");
     	}
     	
-    	if (root == null || !root.isRoot()) {
+    	if (parseNode == null) {
     		throw new IllegalArgumentException("Sentence can only be associated with Root");
     	}
     	
     	this.sentence = sentence;
-    	this.root = root;
+    	this.parseNode = parseNode;
     }
 }

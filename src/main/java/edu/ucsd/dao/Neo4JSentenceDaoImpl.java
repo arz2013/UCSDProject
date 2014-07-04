@@ -9,7 +9,7 @@ import edu.ucsd.model.NonLeafParseNode;
 import edu.ucsd.model.NonLeafToLeaf;
 import edu.ucsd.model.ParseChild;
 import edu.ucsd.model.Sentence;
-import edu.ucsd.model.SentenceToRoot;
+import edu.ucsd.model.SentenceToNonLeafParseNode;
 import edu.ucsd.model.SentenceToWord;
 import edu.ucsd.model.Word;
 import edu.ucsd.model.WordToWordDependency;
@@ -58,7 +58,7 @@ public class Neo4JSentenceDaoImpl implements SentenceDao {
 		}
 	}
 
-	public void save(SentenceToRoot sentenceToRoot) {
+	public void save(SentenceToNonLeafParseNode sentenceToRoot) {
 		if(sentenceToRoot != null) {
 			template.save(sentenceToRoot);
 		}		

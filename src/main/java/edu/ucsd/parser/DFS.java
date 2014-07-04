@@ -10,13 +10,15 @@ import edu.ucsd.model.NonLeafParseNode;
 import edu.ucsd.model.NonLeafToLeaf;
 import edu.ucsd.model.ParseChild;
 import edu.ucsd.model.Sentence;
-import edu.ucsd.model.SentenceToRoot;
+import edu.ucsd.model.SentenceToNonLeafParseNode;
 import edu.ucsd.model.Word;
 
 public class DFS {
 	private SentenceDao sentenceDao;
 	private Sentence sentence;
 	private Map<Word.TextAndPosition, Word> seenWords;
+	
+	private boolean isExcludeRoot = true;
 	
 	private List<String> inOrder = new ArrayList<String>();
 	
@@ -55,18 +57,21 @@ public class DFS {
 
 			Word word = Word.newWord(tree.value(), inOrder.size());
 			word = seenWords.get(word.getTextAndPosition());
-			//System.out.println("Word : " + tree.value() + " Score: " + tree.score());
 			sentenceDao.save(new NonLeafToLeaf(parent, word));
-			//System.out.println("Leaf: " + tree.value());
 			return;
 		} else {
-			sentenceDao.save(currentNode);
-			if(currentNode.isRoot()) {
-				sentenceDao.save(new SentenceToRoot(sentence, currentNode));
-			} else {
-				sentenceDao.save(new ParseChild(parent, currentNode));
+			if(currentNode.isRoot() && !isExcludeRoot) { // Check if the current node is root and whether root needs to be excluded
+				sentenceDao.save(currentNode);			
+				sentenceDao.save(new SentenceToNonLeafParseNode(sentence, currentNode));
+			} else if(parent != null) { 
+				if(isExcludeRoot && parent.isRoot()) { // Check if root needs to be excluded, in which case we link the children of root directly to the sentence
+					sentenceDao.save(currentNode);
+					sentenceDao.save(new SentenceToNonLeafParseNode(sentence, currentNode));
+				} else {
+					sentenceDao.save(currentNode);
+					sentenceDao.save(new ParseChild(parent, currentNode));
+				}
 			}
-			// System.out.println("Non Leaf: " + tree.value());
 		}
 		
 		for(Tree child : children) {

@@ -68,7 +68,7 @@ public class SingleSentenceParseAndLoadTest {
 		});
 		checkValuesFirstSentence(words);
 		checkWordDependenciesFirstSentence(words);
-		checkParseTreeFirstSentence(sentence);
+		checkParseTree(sentence, "FlattenedParseTreeTest.txt");
 	}
 	
 	private void validateSecondSentence() {
@@ -85,10 +85,10 @@ public class SingleSentenceParseAndLoadTest {
 		});
 		checkValuesSecondSentence(words);
 		checkWordDependenciesSecondSentence(words);
-		// checkParseTreeFirstSentence(sentence);
+		checkParseTree(sentence, "FlattenedParseTreeTest1.txt");
 	}
 
-	private void checkParseTreeFirstSentence(Sentence sentence) {
+	private void checkParseTree(Sentence sentence, String expected) {
 		Node node = graphService.getNodeById(sentence.getId());
 		List<String> pathInStrings = new ArrayList<String>();
 		for ( Node pathNode : this.graphService.traversalDescription()
@@ -104,7 +104,7 @@ public class SingleSentenceParseAndLoadTest {
 		}
 		
 		try {
-			List<String> comparisons = FileUtils.readFromFile("FlattenedParseTreeTest.txt");
+			List<String> comparisons = FileUtils.readFromFile(expected);
 			Assert.assertEquals(comparisons, pathInStrings);
 		} catch(IOException ioe) {
 			Assert.fail("IO Exception encountered during comparison");

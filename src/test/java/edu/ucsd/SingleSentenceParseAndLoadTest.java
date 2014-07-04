@@ -31,6 +31,7 @@ public class SingleSentenceParseAndLoadTest {
 	private GraphDatabaseService graphService;
 	private SentenceDao sentenceDao;
 	private String text;
+	private String text1;
 	
 	@Before
 	public void setUp() {
@@ -39,14 +40,21 @@ public class SingleSentenceParseAndLoadTest {
 		graphService = GraphDatabaseService.class.cast(appContext.getBean("graphDatabaseService"));
 		graphService.beginTx();
 		text = "Looking back at everything we’ve accomplished this year, I am once again awed by the tremendous creativity and commitment of the men and women who make up The Walt Disney Company.";
+		text1 = "On behalf of everyone at Disney, I thank you for your continued support as we strive to create the next generation of fantastic family entertainment.";
 		List<String> disneyFinancialStatement = new ArrayList<String>();
-		disneyFinancialStatement.add(text);
+		// disneyFinancialStatement.add(text);
+		disneyFinancialStatement.add(text1);
 		DisneyParser parser = new DisneyParser(sentenceDao, disneyFinancialStatement);
 		parser.parseAndLoad();
 	}
 	
 	@Test
 	public void testParseAndLoad() {
+		//validateFirstSentence();
+		validateSecondSentence();
+	}
+	
+	private void validateFirstSentence() {
 		Sentence sentence = sentenceDao.getSentenceByText(text);
 		Assert.assertTrue(sentence.getSentenceNumber() == 0);
 		Assert.assertEquals(sentence.getText(), text);
@@ -58,12 +66,29 @@ public class SingleSentenceParseAndLoadTest {
 				return new Integer(w1.getPosition()).compareTo(new Integer(w2.getPosition()));
 			}
 		});
-		checkValues(words);
-		checkWordDependencies(words);
-		checkParseTree(sentence);
+		checkValuesFirstSentence(words);
+		checkWordDependenciesFirstSentence(words);
+		checkParseTreeFirstSentence(sentence);
+	}
+	
+	private void validateSecondSentence() {
+		Sentence sentence = sentenceDao.getSentenceByText(text1);
+		Assert.assertTrue(sentence.getSentenceNumber() == 0);
+		Assert.assertEquals(sentence.getText(), text1);
+		List<Word> words = sentenceDao.getWordsBySentenceText(text1);
+		Assert.assertEquals(28, words.size());
+		
+		Collections.sort(words, new Comparator<Word>() {
+			public int compare(Word w1, Word w2) {
+				return new Integer(w1.getPosition()).compareTo(new Integer(w2.getPosition()));
+			}
+		});
+		checkValuesSecondSentence(words);
+		checkWordDependenciesSecondSentence(words);
+		// checkParseTreeFirstSentence(sentence);
 	}
 
-	private void checkParseTree(Sentence sentence) {
+	private void checkParseTreeFirstSentence(Sentence sentence) {
 		Node node = graphService.getNodeById(sentence.getId());
 		List<String> pathInStrings = new ArrayList<String>();
 		for ( Node pathNode : this.graphService.traversalDescription()
@@ -86,7 +111,7 @@ public class SingleSentenceParseAndLoadTest {
 		}
 	}
 
-	private void checkWordDependencies(List<Word> words) {
+	private void checkWordDependenciesFirstSentence(List<Word> words) {
 		checkDependency(words.get(15), words.get(1), "vmod");
 		checkDependency(words.get(1), words.get(2), "advmod");
 		checkDependency(words.get(1), words.get(3), "prep");
@@ -120,13 +145,42 @@ public class SingleSentenceParseAndLoadTest {
 		checkDependency(words.get(33), words.get(32), "nn");
 		checkDependency(words.get(28), words.get(33), "dobj");
 	}
+	
+	private void checkWordDependenciesSecondSentence(List<Word> words) {
+		checkDependency(words.get(9), words.get(1), "prep");
+		checkDependency(words.get(1), words.get(2), "pobj");
+		checkDependency(words.get(2), words.get(3), "prep");
+		checkDependency(words.get(3), words.get(4), "pobj");
+		checkDependency(words.get(4), words.get(5), "prep");
+		checkDependency(words.get(5), words.get(6), "pobj");
+		checkDependency(words.get(9), words.get(8), "nsubj");
+		checkDependency(words.get(0), words.get(9), "root");
+		checkDependency(words.get(9), words.get(10), "dobj");
+		checkDependency(words.get(9), words.get(11), "prep");
+		checkDependency(words.get(14), words.get(12), "poss");
+		checkDependency(words.get(14), words.get(13), "amod");
+		checkDependency(words.get(11), words.get(14), "pobj");
+		checkDependency(words.get(17), words.get(15), "mark");
+		checkDependency(words.get(17), words.get(16), "nsubj");
+		checkDependency(words.get(9), words.get(17), "advcl");
+		checkDependency(words.get(19), words.get(18), "aux");
+		checkDependency(words.get(17), words.get(19), "xcomp");
+		checkDependency(words.get(22), words.get(20), "det");
+		checkDependency(words.get(22), words.get(21), "amod");
+		checkDependency(words.get(19), words.get(22), "dobj");
+		checkDependency(words.get(22), words.get(23), "prep");
+		checkDependency(words.get(25), words.get(24), "dep");
+		checkDependency(words.get(26), words.get(25), "amod");
+		checkDependency(words.get(23), words.get(26), "pobj");
+	}
+
 
 	private void checkDependency(Word word, Word word2, String dependency) {
 		String dep = sentenceDao.getRelationShip(word.getId(), word2.getId());
 		Assert.assertEquals(dependency, dep);
 	}
 
-	private void checkValues(List<Word> words) {
+	private void checkValuesFirstSentence(List<Word> words) {
 		System.out.println("Asserting Values");
 		this.checkValue(words.get(0), 0, "ROOT", null, null);
 		this.checkValue(words.get(1), 1, "Looking", "VBG", "O");
@@ -163,6 +217,38 @@ public class SingleSentenceParseAndLoadTest {
 		this.checkValue(words.get(32), 32, "Disney", "NNP", "ORGANIZATION");
 		this.checkValue(words.get(33), 33, "Company", "NNP", "ORGANIZATION");
 		this.checkValue(words.get(34), 34, ".", ".", "O");
+	}
+	
+	private void checkValuesSecondSentence(List<Word> words) {
+		System.out.println("Asserting Values");
+		this.checkValue(words.get(0), 0, "ROOT", null, null);
+		this.checkValue(words.get(1), 1, "On", "IN", "O");
+		this.checkValue(words.get(2), 2, "behalf", "NN", "O");
+		this.checkValue(words.get(3), 3, "of", "IN", "O");
+		this.checkValue(words.get(4), 4, "everyone", "NN", "O");
+		this.checkValue(words.get(5), 5, "at", "IN", "O");
+		this.checkValue(words.get(6), 6, "Disney", "NNP", "ORGANIZATION");
+		this.checkValue(words.get(7), 7, ",", ",", "O");
+		this.checkValue(words.get(8), 8, "I", "PRP", "O");
+		this.checkValue(words.get(9), 9, "thank", "VBP", "O");
+		this.checkValue(words.get(10), 10, "you", "PRP", "O");
+		this.checkValue(words.get(11), 11, "for", "IN", "O");
+		this.checkValue(words.get(12), 12, "your", "PRP$", "O");
+		this.checkValue(words.get(13), 13, "continued", "JJ", "O");
+		this.checkValue(words.get(14), 14, "support", "NN", "O");
+		this.checkValue(words.get(15), 15, "as", "IN", "O");
+		this.checkValue(words.get(16), 16, "we", "PRP", "O");
+		this.checkValue(words.get(17), 17, "strive", "VBP", "O");
+		this.checkValue(words.get(18), 18, "to", "TO", "O");
+		this.checkValue(words.get(19), 19, "create", "VB", "O");
+		this.checkValue(words.get(20), 20, "the", "DT", "O");
+		this.checkValue(words.get(21), 21, "next", "JJ", "O");
+		this.checkValue(words.get(22), 22, "generation", "NN", "O");
+		this.checkValue(words.get(23), 23, "of", "IN", "O");
+		this.checkValue(words.get(24), 24, "fantastic", "JJ", "O");
+		this.checkValue(words.get(25), 25, "family", "NN", "O");
+		this.checkValue(words.get(26), 26, "entertainment", "NN", "O");
+		this.checkValue(words.get(27), 27, ".", ".", "O");
 	}
 
 	private void checkValue(Word word, int i, String text, String posTag,

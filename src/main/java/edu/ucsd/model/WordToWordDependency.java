@@ -18,7 +18,8 @@ public class WordToWordDependency {
     
     private String dependency;
     
-    private WordToWordDependency() {	
+    @SuppressWarnings("unused")
+	private WordToWordDependency() {	
     }
     
     public WordToWordDependency(Word startWord, Word endWord, String dependency) {

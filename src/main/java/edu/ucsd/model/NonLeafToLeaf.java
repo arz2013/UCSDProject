@@ -16,7 +16,8 @@ public class NonLeafToLeaf {
     @EndNode
     private Word child;
     
-    private NonLeafToLeaf() {
+    @SuppressWarnings("unused")
+	private NonLeafToLeaf() {
     }
     
     public NonLeafToLeaf(NonLeafParseNode parent, Word child) {

@@ -2,6 +2,8 @@ package edu.ucsd.dao;
 
 import java.util.List;
 
+import edu.ucsd.model.Document;
+import edu.ucsd.model.DocumentToSentence;
 import edu.ucsd.model.NonLeafParseNode;
 import edu.ucsd.model.NonLeafToLeaf;
 import edu.ucsd.model.ParseChild;
@@ -23,4 +25,8 @@ public interface SentenceDao {
 	public Sentence getSentenceByText(String text);
 	public List<Word> getWordsBySentenceText(String text);
 	public String getRelationShip(Long startWordId, Long endWordId);
+	public void save(Document document);
+	public void save(DocumentToSentence documentToSentence);
+	public Document getDocumentByTitleYearAndNumber(String title, int year, int documentNumber);
+	public List<Sentence> getSentencesBasedOnDocument(Long documentId);
 }

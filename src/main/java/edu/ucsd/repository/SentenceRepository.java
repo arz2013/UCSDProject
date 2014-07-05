@@ -7,7 +7,6 @@ import org.springframework.data.neo4j.repository.GraphRepository;
 
 import edu.ucsd.model.Sentence;
 import edu.ucsd.model.Word;
-import edu.ucsd.model.WordToWordDependency;
 
 public interface SentenceRepository extends GraphRepository<Sentence> {
 	@Query("match (s:_Sentence{text:{0}}) return s")
@@ -18,4 +17,7 @@ public interface SentenceRepository extends GraphRepository<Sentence> {
 	
 	@Query("match (w:_Word)-[h:WORD_DEPENDENCY]->(w1:_Word) where id(w) = {0} and id(w1) = {1} return h.dependency")
 	public String getRelationShip(Long startWordId, Long endWordId);
+	
+	@Query("match (d:_Document)-[h:HAS_SENTENCE]->(s:_Sentence) where id(d) = {0} return s order by s.sNum")
+	public List<Sentence> getSentencesBasedOnDocument(Long documentId);
 }

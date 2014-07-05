@@ -17,7 +17,8 @@ public class LeafToNonLeaf {
     @EndNode 
     private NonLeafParseNode end;
     
-    private LeafToNonLeaf() {
+    @SuppressWarnings("unused")
+	private LeafToNonLeaf() {
     }
     
     public LeafToNonLeaf(Word start, NonLeafParseNode end) {

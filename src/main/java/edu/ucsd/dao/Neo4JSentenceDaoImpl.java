@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 
+import edu.ucsd.model.Document;
+import edu.ucsd.model.DocumentToSentence;
 import edu.ucsd.model.NonLeafParseNode;
 import edu.ucsd.model.NonLeafToLeaf;
 import edu.ucsd.model.ParseChild;
@@ -13,6 +15,7 @@ import edu.ucsd.model.SentenceToNonLeafParseNode;
 import edu.ucsd.model.SentenceToWord;
 import edu.ucsd.model.Word;
 import edu.ucsd.model.WordToWordDependency;
+import edu.ucsd.repository.DocumentRepository;
 import edu.ucsd.repository.SentenceRepository;
 
 public class Neo4JSentenceDaoImpl implements SentenceDao {
@@ -21,6 +24,9 @@ public class Neo4JSentenceDaoImpl implements SentenceDao {
 	
 	@Autowired
 	private SentenceRepository repository;
+	
+	@Autowired
+	private DocumentRepository docRepository;
 
 	public void save(Sentence newSentence) {
 		if(newSentence != null) {
@@ -80,5 +86,26 @@ public class Neo4JSentenceDaoImpl implements SentenceDao {
 
 	public String getRelationShip(Long startWordId, Long endWordId) {
 		return repository.getRelationShip(startWordId, endWordId);
+	}
+
+	public void save(Document document) {
+		if(document != null) {
+			template.save(document);
+		}
+	}
+
+	public void save(DocumentToSentence documentToSentence) {
+		if(documentToSentence != null) {
+			template.save(documentToSentence);
+		}
+	}
+
+	public Document getDocumentByTitleYearAndNumber(String title, int year,
+			int documentNumber) {
+		return docRepository.getDocumentByTitleYearAndNumber(title, year, documentNumber);
+	}
+	
+	public List<Sentence> getSentencesBasedOnDocument(Long documentId) {
+		return repository.getSentencesBasedOnDocument(documentId);
 	}
 }

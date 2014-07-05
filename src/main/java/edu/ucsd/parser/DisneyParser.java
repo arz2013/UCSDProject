@@ -25,6 +25,8 @@ import edu.stanford.nlp.trees.TypedDependency;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
 import edu.ucsd.dao.SentenceDao;
+import edu.ucsd.model.Document;
+import edu.ucsd.model.DocumentToSentence;
 import edu.ucsd.model.Sentence;
 import edu.ucsd.model.Word;
 import edu.ucsd.model.WordToWordDependency;
@@ -32,21 +34,26 @@ import edu.ucsd.model.WordToWordDependency;
 public class DisneyParser {
 	private SentenceDao sentenceDao;
 	private List<String> disneyFinancialStatement;
+	private Document document;
 	
 	public DisneyParser(SentenceDao sentenceDao,
-			List<String> disneyFinancialStatement) {
+						List<String> disneyFinancialStatement, 
+						Document document) {
 		super();
-		if(sentenceDao == null || disneyFinancialStatement == null) {
+		if(sentenceDao == null || disneyFinancialStatement == null || document == null) {
 			throw new IllegalArgumentException("Neither parameters to constructor can be null");
 		}
 		this.sentenceDao = sentenceDao;
 		this.disneyFinancialStatement = disneyFinancialStatement;
+		this.document = document;
 	}
 	
 	public void parseAndLoad() {
 		Properties props = new Properties();
 		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
 		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+		
+		sentenceDao.save(this.document);
 		
 		int noSentence = 0;
 
@@ -98,6 +105,7 @@ public class DisneyParser {
 				// traversing the words in the current sentence
 				// a CoreLabel is a CoreMap with additional token-specific methods
 				sentenceDao.save(newSentence);
+				sentenceDao.save(new DocumentToSentence(this.document, newSentence));
 
 				// this is the parse tree of the current sentence
 				Tree tree = sentence.get(TreeAnnotation.class);

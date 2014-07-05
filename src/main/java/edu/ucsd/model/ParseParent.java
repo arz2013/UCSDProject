@@ -17,7 +17,8 @@ public class ParseParent {
     @EndNode
     private NonLeafParseNode parent;
     
-    private ParseParent() {
+    @SuppressWarnings("unused")
+	private ParseParent() {
     }
 
 	public ParseParent(NonLeafParseNode child, NonLeafParseNode parent) {

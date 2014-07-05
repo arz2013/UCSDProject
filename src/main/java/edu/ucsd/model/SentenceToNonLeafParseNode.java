@@ -16,7 +16,8 @@ public class SentenceToNonLeafParseNode {
     @EndNode
     private NonLeafParseNode parseNode;
     
-    private SentenceToNonLeafParseNode() {
+    @SuppressWarnings("unused")
+	private SentenceToNonLeafParseNode() {
     }
     
     public SentenceToNonLeafParseNode(Sentence sentence, NonLeafParseNode parseNode) {

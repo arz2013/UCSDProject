@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import edu.ucsd.dao.SentenceDao;
+import edu.ucsd.model.Document;
 import edu.ucsd.model.Rel;
 import edu.ucsd.model.Sentence;
 import edu.ucsd.model.Word;
@@ -44,14 +45,24 @@ public class SingleSentenceParseAndLoadTest {
 		List<String> disneyFinancialStatement = new ArrayList<String>();
 		disneyFinancialStatement.add(text);
 		disneyFinancialStatement.add(text1);
-		DisneyParser parser = new DisneyParser(sentenceDao, disneyFinancialStatement);
+		DisneyParser parser = new DisneyParser(sentenceDao, disneyFinancialStatement, new Document("Disney Financial Statement", 2013, 0));
 		parser.parseAndLoad();
 	}
 	
 	@Test
 	public void testParseAndLoad() {
+		validateDocument();
 		validateFirstSentence();
 		validateSecondSentence();
+	}
+	
+	private void validateDocument() {
+		Document doc = sentenceDao.getDocumentByTitleYearAndNumber("Disney Financial Statement", 2013, 0);
+		Assert.assertNotNull(doc);
+		List<Sentence> sentences = sentenceDao.getSentencesBasedOnDocument(doc.getId());
+		Assert.assertTrue(sentences.size() == 2);
+		Assert.assertEquals(text, sentences.get(0).getText());
+		Assert.assertEquals(text1,sentences.get(1).getText());
 	}
 	
 	private void validateFirstSentence() {

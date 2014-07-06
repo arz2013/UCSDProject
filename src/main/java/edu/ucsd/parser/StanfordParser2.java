@@ -1,6 +1,5 @@
 package edu.ucsd.parser;
 
-import edu.ucsd.dao.SentenceDao;
 import edu.ucsd.model.Document;
 import edu.ucsd.system.SystemApplicationContext;
 
@@ -56,11 +55,10 @@ public class StanfordParser2 {
 		
 		stopWatch.start();
 		ApplicationContext appContext = SystemApplicationContext.getApplicationContext();
-		SentenceDao sentenceDao = SentenceDao.class.cast(appContext.getBean("sentenceDao")); 
 
-		List<String> disneyFinancialStatement = readDisneyFinancialStatement();		
-		DisneyParser parser = new DisneyParser(sentenceDao, disneyFinancialStatement, new Document("Disney Financial Statement", 2013, 0));
-		parser.parseAndLoad();
+		List<String> disneyFinancialStatement = readDisneyFinancialStatement();	
+		DisneyParser parser = DisneyParser.class.cast(appContext.getBean("parser"));
+		parser.parseAndLoad(disneyFinancialStatement, new Document("Disney Financial Statement", 2013, 0));
 		
 		stopWatch.stop();
 		System.out.println(stopWatch.prettyPrint());

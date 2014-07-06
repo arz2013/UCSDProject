@@ -14,9 +14,11 @@
     <neo4j:config graphDatabaseService="graphDatabaseService" base-package="edu.ucsd.model"/>
     <neo4j:repositories base-package="edu.ucsd.repository"/>
     <context:component-scan base-package="edu.ucsd.dao"/>
+    <context:component-scan base-package="edu.ucsd.parser"/>
     <tx:annotation-driven/>
 	<bean id="graphDatabaseService" 
 		  class="org.neo4j.test.ImpermanentGraphDatabase" destroy-method="shutdown">
 	</bean>
 	<bean name="sentenceDao" class="edu.ucsd.dao.Neo4JSentenceDaoImpl"/>
+	<bean name="parser" class="edu.ucsd.parser.DisneyParser"/>
 </beans>

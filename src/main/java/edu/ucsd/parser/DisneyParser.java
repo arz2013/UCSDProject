@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
 import edu.stanford.nlp.ling.CoreAnnotations.IndexAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
@@ -33,27 +36,23 @@ import edu.ucsd.model.WordToWordDependency;
 
 public class DisneyParser {
 	private SentenceDao sentenceDao;
-	private List<String> disneyFinancialStatement;
-	private Document document;
 	
-	public DisneyParser(SentenceDao sentenceDao,
-						List<String> disneyFinancialStatement, 
-						Document document) {
-		super();
-		if(sentenceDao == null || disneyFinancialStatement == null || document == null) {
-			throw new IllegalArgumentException("Neither parameters to constructor can be null");
-		}
+	@Autowired
+	public void setSentenceDao(SentenceDao sentenceDao) {
 		this.sentenceDao = sentenceDao;
-		this.disneyFinancialStatement = disneyFinancialStatement;
-		this.document = document;
 	}
 	
-	public void parseAndLoad() {
+	@Transactional
+	public void parseAndLoad(List<String> disneyFinancialStatement, Document doc) {
+		if(disneyFinancialStatement == null || doc == null) {
+			throw new IllegalArgumentException("Neither parameters can be null");
+		}
+		
 		Properties props = new Properties();
 		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
 		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 		
-		sentenceDao.save(this.document);
+		sentenceDao.save(doc);
 		
 		int noSentence = 0;
 
@@ -105,7 +104,7 @@ public class DisneyParser {
 				// traversing the words in the current sentence
 				// a CoreLabel is a CoreMap with additional token-specific methods
 				sentenceDao.save(newSentence);
-				sentenceDao.save(new DocumentToSentence(this.document, newSentence));
+				sentenceDao.save(new DocumentToSentence(doc, newSentence));
 
 				// this is the parse tree of the current sentence
 				Tree tree = sentence.get(TreeAnnotation.class);

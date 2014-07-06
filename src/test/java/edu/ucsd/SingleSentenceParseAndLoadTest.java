@@ -12,9 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.traversal.Evaluators;
-import org.neo4j.kernel.Traversal;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -23,9 +21,7 @@ import edu.ucsd.model.Document;
 import edu.ucsd.model.Rel;
 import edu.ucsd.model.Sentence;
 import edu.ucsd.model.Word;
-import edu.ucsd.model.WordToWordDependency;
 import edu.ucsd.parser.DisneyParser;
-import edu.ucsd.system.SystemApplicationContext;
 import edu.ucsd.utils.FileUtils;
 
 public class SingleSentenceParseAndLoadTest {
@@ -45,8 +41,8 @@ public class SingleSentenceParseAndLoadTest {
 		List<String> disneyFinancialStatement = new ArrayList<String>();
 		disneyFinancialStatement.add(text);
 		disneyFinancialStatement.add(text1);
-		DisneyParser parser = new DisneyParser(sentenceDao, disneyFinancialStatement, new Document("Disney Financial Statement", 2013, 0));
-		parser.parseAndLoad();
+		DisneyParser parser = DisneyParser.class.cast(appContext.getBean("parser"));
+		parser.parseAndLoad(disneyFinancialStatement, new Document("Disney Financial Statement", 2013, 0));
 	}
 	
 	@Test

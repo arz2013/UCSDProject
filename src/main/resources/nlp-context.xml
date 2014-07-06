@@ -2,6 +2,7 @@
        xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 					       http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -9,15 +10,31 @@
 					       http://www.springframework.org/schema/context/spring-context.xsd
 					       http://www.springframework.org/schema/data/neo4j
 					       http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd
+					       http://www.springframework.org/schema/util
+     					   http://www.springframework.org/schema/util/spring-util.xsd
 					       http://www.springframework.org/schema/tx
      					   http://www.springframework.org/schema/tx/spring-tx.xsd">
-    <neo4j:config graphDatabaseService="graphDatabaseService" base-package="edu.ucsd.model"/>
+    <neo4j:config graphDatabaseService="graphDatabaseService"  base-package="edu.ucsd.model"/>
     <neo4j:repositories base-package="edu.ucsd.repository"/>
     <context:component-scan base-package="edu.ucsd.dao"/>
+    <context:component-scan base-package="edu.ucsd.parser"/>
     <tx:annotation-driven/>
-	<bean id="graphDatabaseService" 
-		  class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase">
-  		<constructor-arg index="0" value="http://localhost:7474/db/data" />
+    <util:map id="config">
+		<entry key="enable_remote_shell" value="true"/>
+	</util:map>
+ 
+	<bean id="graphDbFactory" class="org.neo4j.graphdb.factory.GraphDatabaseFactory"/>
+ 
+	<bean id="graphDbBuilder" factory-bean="graphDbFactory" factory-method="newEmbeddedDatabaseBuilder">
+		<constructor-arg value="target/data/graph.db"/>
 	</bean>
+ 
+	<bean id="graphDbBuilderFinal" factory-bean="graphDbBuilder" factory-method="setConfig">
+		<constructor-arg ref="config"/>
+	</bean>
+ 
+	<bean id="graphDatabaseService" factory-bean="graphDbBuilderFinal" factory-method="newGraphDatabase" destroy-method="shutdown" /> 
 	<bean name="sentenceDao" class="edu.ucsd.dao.Neo4JSentenceDaoImpl"/>
+	
+	<bean name="parser" class="edu.ucsd.parser.DisneyParser"/>
 </beans>

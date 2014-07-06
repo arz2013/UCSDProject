@@ -66,10 +66,7 @@ public class DisneyParser {
 			// these are all the sentences in this document
 			// a CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 			List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-			
-			Sentence newSentence = Sentence.newSentence(text, noSentence);
-			sentenceDao.save(newSentence);
-			
+				
 			if(sentences.size() > 1) {
 				// An example: Walt Disney famously said, “Disneyland will never be completed. It will continue to grow as long as there is imagination left in the world.”
 				System.out.println("Sentence with 2 coremaps: " + text);
@@ -85,6 +82,9 @@ public class DisneyParser {
 				
 				sentenceDao.save(root);
 				seenWords.put(root.getTextAndPosition(), root);
+				
+				Sentence newSentence = Sentence.newSentence(sentence.get(TextAnnotation.class), noSentence);
+				sentenceDao.save(newSentence);
 				
 				newSentence.addWord(root);
 				
@@ -132,7 +132,7 @@ public class DisneyParser {
 				// Now save the parse trees as well
 				DFS dfs = new DFS(sentenceDao, newSentence, seenWords);
 				dfs.performDepthFirstTraversal(tree);
-				
+			
 				noSentence++;
 				seenWords.clear();
 			}

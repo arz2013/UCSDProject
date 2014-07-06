@@ -56,7 +56,7 @@ public class DisneyParser {
 		
 		int noSentence = 0;
 
-		for(String text : disneyFinancialStatement ) {
+		for(String text : disneyFinancialStatement) {
 			// create an empty Annotation just with the given text
 			Annotation document = new Annotation(text);
 
@@ -66,6 +66,14 @@ public class DisneyParser {
 			// these are all the sentences in this document
 			// a CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 			List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+			
+			Sentence newSentence = Sentence.newSentence(text, noSentence);
+			sentenceDao.save(newSentence);
+			
+			if(sentences.size() > 1) {
+				// An example: Walt Disney famously said, “Disneyland will never be completed. It will continue to grow as long as there is imagination left in the world.”
+				System.out.println("Sentence with 2 coremaps: " + text);
+			}
 		
 			for(CoreMap sentence: sentences) {
 				int wordIndex = 0; 
@@ -78,7 +86,6 @@ public class DisneyParser {
 				sentenceDao.save(root);
 				seenWords.put(root.getTextAndPosition(), root);
 				
-				Sentence newSentence = Sentence.newSentence(text, noSentence);
 				newSentence.addWord(root);
 				
 				for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
@@ -103,7 +110,7 @@ public class DisneyParser {
 
 				// traversing the words in the current sentence
 				// a CoreLabel is a CoreMap with additional token-specific methods
-				sentenceDao.save(newSentence);
+		
 				sentenceDao.save(new DocumentToSentence(doc, newSentence));
 
 				// this is the parse tree of the current sentence

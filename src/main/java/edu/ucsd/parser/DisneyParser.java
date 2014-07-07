@@ -84,7 +84,6 @@ public class DisneyParser {
 				seenWords.put(root.getTextAndPosition(), root);
 				
 				Sentence newSentence = Sentence.newSentence(sentence.get(TextAnnotation.class), noSentence);
-				sentenceDao.save(newSentence);
 				
 				newSentence.addWord(root);
 				
@@ -107,7 +106,9 @@ public class DisneyParser {
 					
 					wordIndex++;
 				}
-
+				
+				sentenceDao.save(newSentence);
+				
 				// traversing the words in the current sentence
 				// a CoreLabel is a CoreMap with additional token-specific methods
 		

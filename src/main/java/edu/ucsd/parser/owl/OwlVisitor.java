@@ -20,20 +20,27 @@ import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 import org.semanticweb.owlapi.util.OWLOntologyWalker;
 import org.semanticweb.owlapi.util.OWLOntologyWalkerVisitor;
 
-public class OwlVisitor extends OWLOntologyWalkerVisitor<Void> {
+// Logging
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	public OwlVisitor(OWLOntologyWalker walker) {
+public class OWLVisitor extends OWLOntologyWalkerVisitor<Void> {
+	private static Logger logger = LoggerFactory.getLogger(OWLVisitor.class);
+
+	public OWLVisitor(OWLOntologyWalker walker) {
 		super(walker);
-		// TODO Auto-generated constructor stub
+		logger.info("Inside OWLVisitor constructor");
 	}
 
 	@Override
     public Void visit(OWLOntology ontology) {
+		logger.info("OWL Ontology Information: " + ontology.toString());
 		return null;
 	}
 	
 	@Override
 	public Void visit(OWLClass desc) {
+		logger.info("OWN Class Information: " + desc.toString());
 		return null;
 	}  
 	

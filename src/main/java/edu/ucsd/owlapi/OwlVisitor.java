@@ -1,4 +1,4 @@
-package edu.ucsd.parser.owl;
+package edu.ucsd.owlapi;
 
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;

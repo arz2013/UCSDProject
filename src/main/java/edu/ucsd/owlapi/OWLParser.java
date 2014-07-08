@@ -1,4 +1,4 @@
-package edu.ucsd.parser.owl;
+package edu.ucsd.owlapi;
 
 import java.io.File;
 

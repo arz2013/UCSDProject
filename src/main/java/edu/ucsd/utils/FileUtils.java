@@ -12,19 +12,14 @@ import edu.ucsd.parser.SentenceBreaker;
 public abstract class FileUtils {
 	public static List<String> readFromFile(String fileName) throws IOException {
 		InputStream is = SentenceBreaker.class.getClassLoader().getResourceAsStream(fileName);
-		BufferedReader br = null;
 		List<String> result = new ArrayList<String>();
 			
-		try {
-			br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-	
+		try(BufferedReader br =  new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
 			String inputLine;
 			while((inputLine = br.readLine()) != null) {
 				result.add(inputLine);
 			}
-		} finally {
-			br.close();
-		}
+		} 
 		
 		return result;
 	}

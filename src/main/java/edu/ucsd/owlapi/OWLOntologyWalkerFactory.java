@@ -30,7 +30,7 @@ public class OWLOntologyWalkerFactory {
 				manager.loadOntologyFromOntologyDocument(new File(url));
 			}
 		}
-		logger.info(format("loaded ontologies with owlapi in %d seconds", timer.elapsed(TimeUnit.SECONDS)));
+		logger.info(format("Loaded ontologies with owlapi in %d seconds", timer.elapsed(TimeUnit.SECONDS)));
 		return new OWLOntologyWalker(manager.getOntologies());
 	}
 }

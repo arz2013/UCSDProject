@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.stanford.nlp.ling.CoreAnnotations.IndexAnnotation;
@@ -37,11 +38,11 @@ import edu.ucsd.model.WordToWordDependency;
 public class DisneyParser {
 	private SentenceDao sentenceDao;
 	
-	@Autowired
+	@Inject
 	public void setSentenceDao(SentenceDao sentenceDao) {
 		this.sentenceDao = sentenceDao;
 	}
-	
+
 	@Transactional
 	public void parseAndLoad(List<String> disneyFinancialStatement, Document doc) {
 		if(disneyFinancialStatement == null || doc == null) {

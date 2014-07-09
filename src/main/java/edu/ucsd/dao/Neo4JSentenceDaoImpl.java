@@ -2,6 +2,8 @@ package edu.ucsd.dao;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 
@@ -19,13 +21,13 @@ import edu.ucsd.repository.DocumentRepository;
 import edu.ucsd.repository.SentenceRepository;
 
 public class Neo4JSentenceDaoImpl implements SentenceDao {
-	@Autowired
+	@Inject
 	private Neo4jTemplate template;
 	
-	@Autowired
+	@Inject
 	private SentenceRepository repository;
 	
-	@Autowired
+	@Inject
 	private DocumentRepository docRepository;
 
 	public void save(Sentence newSentence) {

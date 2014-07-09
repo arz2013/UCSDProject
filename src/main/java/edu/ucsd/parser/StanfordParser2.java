@@ -1,5 +1,8 @@
 package edu.ucsd.parser;
 
+import static com.google.inject.spring.SpringIntegration.fromSpring;
+
+import edu.ucsd.dao.SentenceDao;
 import edu.ucsd.model.Document;
 import edu.ucsd.system.SystemApplicationContext;
 
@@ -11,8 +14,12 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.util.StopWatch;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 public class StanfordParser2 {
 	
@@ -50,14 +57,24 @@ public class StanfordParser2 {
 	    return sentences;
 	}
 	
-	public static void main(String[] args) throws IOException {
-		StopWatch stopWatch = new StopWatch("Parsing and Insertion");
-		
-		stopWatch.start();
-		ApplicationContext appContext = SystemApplicationContext.getApplicationContext();
+	
+	private static class SpringModule extends AbstractModule {
 
+		@Override
+		protected void configure() {
+			bind(BeanFactory.class).toInstance(SystemApplicationContext.getApplicationContext());	
+			bind(SentenceDao.class).toProvider(fromSpring(SentenceDao.class, "sentenceDao"));
+			bind(DisneyParser.class).toProvider(fromSpring(DisneyParser.class, "parser"));
+		}
+	}
+	
+	public static void main(String[] args) throws IOException {
+		StopWatch stopWatch = new StopWatch("Parsing and Insertion");		
+		stopWatch.start();
+		Injector injector = Guice.createInjector(new SpringModule());
+		
 		List<String> disneyFinancialStatement = readDisneyFinancialStatement();	
-		DisneyParser parser = DisneyParser.class.cast(appContext.getBean("parser"));
+		DisneyParser parser = injector.getInstance(DisneyParser.class);
 		parser.parseAndLoad(disneyFinancialStatement, new Document("Disney Financial Statement", 2013, 0));
 		
 		stopWatch.stop();

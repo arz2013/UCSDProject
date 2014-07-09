@@ -17,6 +17,9 @@ import org.neo4j.graphdb.traversal.Evaluators;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 import edu.ucsd.dao.SentenceDao;
 import edu.ucsd.model.Document;
 import edu.ucsd.model.Rel;
@@ -33,16 +36,16 @@ public class SingleSentenceParseAndLoadTest {
 	
 	@Before
 	public void setUp() {
-		ApplicationContext appContext = new ClassPathXmlApplicationContext("nlp-context-test.xml");	
-		sentenceDao = SentenceDao.class.cast(appContext.getBean("sentenceDao")); 
-		graphService = GraphDatabaseService.class.cast(appContext.getBean("graphDatabaseService"));
+		Injector injector = Guice.createInjector(new SpringTestModule());
+		sentenceDao = injector.getInstance(SentenceDao.class); 
+		graphService = injector.getInstance(GraphDatabaseService.class);
 		graphService.beginTx();
 		text = "Looking back at everything we’ve accomplished this year, I am once again awed by the tremendous creativity and commitment of the men and women who make up The Walt Disney Company.";
 		text1 = "On behalf of everyone at Disney, I thank you for your continued support as we strive to create the next generation of fantastic family entertainment.";
 		List<String> disneyFinancialStatement = new ArrayList<String>();
 		disneyFinancialStatement.add(text);
 		disneyFinancialStatement.add(text1);
-		DisneyParser parser = DisneyParser.class.cast(appContext.getBean("parser"));
+		DisneyParser parser = injector.getInstance(DisneyParser.class);
 		parser.parseAndLoad(disneyFinancialStatement, new Document("Disney Financial Statement", 2013, 0));
 	}
 	

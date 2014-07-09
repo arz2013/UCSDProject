@@ -1,7 +1,6 @@
 package edu.ucsd.parser;
 
 import static com.google.inject.spring.SpringIntegration.fromSpring;
-
 import edu.ucsd.dao.SentenceDao;
 import edu.ucsd.model.Document;
 import edu.ucsd.system.SystemApplicationContext;
@@ -14,6 +13,8 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.util.StopWatch;
 
@@ -22,6 +23,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 public class StanfordParser2 {
+	private static Logger logger = LoggerFactory.getLogger(StanfordParser2.class);
 	
 	private static List<String> readDisneyFinancialStatement() throws IOException {
 		InputStream is = SentenceBreaker.class.getClassLoader().getResourceAsStream("DFS.txt");
@@ -78,6 +80,6 @@ public class StanfordParser2 {
 		parser.parseAndLoad(disneyFinancialStatement, new Document("Disney Financial Statement", 2013, 0));
 		
 		stopWatch.stop();
-		System.out.println(stopWatch.prettyPrint());
+		logger.info(stopWatch.prettyPrint());
 	}
 }

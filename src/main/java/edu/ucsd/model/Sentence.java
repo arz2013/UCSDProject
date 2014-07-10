@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.neo4j.annotation.Fetch;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.NodeEntity;
@@ -12,6 +13,7 @@ import org.springframework.data.neo4j.annotation.RelatedToVia;
 import edu.ucsd.utils.LabelUtils;
 
 @NodeEntity
+@TypeAlias("_Sentence")
 public class Sentence {
 	@GraphId
 	private Long id;

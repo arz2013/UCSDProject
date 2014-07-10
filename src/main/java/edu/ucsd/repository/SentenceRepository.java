@@ -9,15 +9,15 @@ import edu.ucsd.model.Sentence;
 import edu.ucsd.model.Word;
 
 public interface SentenceRepository extends GraphRepository<Sentence> {
-	@Query("start s = node(*) match (s:_Sentence{text:{0}}) return s")
+	@Query("start s = node:__types__(className=\"_Sentence\") where s.text = {0} return s")
 	public Sentence getSentenceByText(String text);
 
-	@Query("start w = node(*) match (s:_Sentence{text:{0}})-[h:HAS_WORD]->(w:_Word) return w")
+	@Query("start s = node:__types__(className=\"_Sentence\"), w = node:__types__(className=\"_Word\") match (s)-[:HAS_WORD]->(w) where s.text = {0} return w")
 	public List<Word> getWordsBySentenceText(String text);
 	
-	@Query("start h = relationship(*) match (w:_Word)-[h:WORD_DEPENDENCY]->(w1:_Word) where id(w) = {0} and id(w1) = {1} return h.dependency")
+	@Query("start w = node:__types__(className=\"_Word\"), w1 = node:__types__(className=\"_Word\") match (w)-[h:WORD_DEPENDENCY]->(w1) where id(w) = {0} and id(w1) = {1} return h.dependency")
 	public String getRelationShip(Long startWordId, Long endWordId);
-	
-	@Query("start s = node(*) match (d:_Document)-[h:HAS_SENTENCE]->(s:_Sentence) where id(d) = {0} return s order by s.sNum")
+
+	@Query("start d = node:__types__(className=\"_Document\"), s = node:__types__(className=\"_Sentence\") match (d)-[:HAS_SENTENCE]->(s) where id(d) = {0} return s order by s.sNum")
 	public List<Sentence> getSentencesBasedOnDocument(Long documentId);
 }

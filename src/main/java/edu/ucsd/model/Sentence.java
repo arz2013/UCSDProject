@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.springframework.data.neo4j.annotation.Fetch;
 import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Labels;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 import org.springframework.data.neo4j.annotation.RelatedToVia;
 
@@ -21,7 +20,6 @@ public class Sentence {
 	
 	private int sNum;
 	
-	@Labels
 	private Set<String> labels = new HashSet<String>();
 	
 	@Fetch

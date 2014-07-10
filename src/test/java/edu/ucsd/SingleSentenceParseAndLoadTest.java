@@ -12,10 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.Evaluators;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.neo4j.kernel.Traversal;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -102,7 +100,7 @@ public class SingleSentenceParseAndLoadTest {
 	private void checkParseTree(Sentence sentence, String expected) {
 		Node node = graphService.getNodeById(sentence.getId());
 		List<String> pathInStrings = new ArrayList<String>();
-		for ( Node pathNode : this.graphService.traversalDescription()
+		for ( Node pathNode : Traversal.description().depthFirst()
 			    .depthFirst()
 			    .relationships( Rel.HAS_PARSE_CHILD )
 			    .evaluator( Evaluators.toDepth( 15 ) )

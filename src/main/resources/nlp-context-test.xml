@@ -16,9 +16,9 @@
     <context:component-scan base-package="edu.ucsd.dao"/>
     <context:component-scan base-package="edu.ucsd.parser"/>
     <tx:annotation-driven/>
-	<bean id="graphDatabaseService" 
-		  class="org.neo4j.test.ImpermanentGraphDatabase" destroy-method="shutdown">
-	</bean>
+    <bean id="graphDatabaseService" class="org.neo4j.test.ImpermanentGraphDatabase" destroy-method="shutdown"/>
+	<!-- bean id="graphDatabaseService" factory-bean="testGraphServiceFactory" factory-method="newImpermanentDatabase" destroy-method="shutdown"/-->
+    <!-- bean id="testGraphServiceFactory" class="org.neo4j.test.TestGraphDatabaseFactory"/ -->
 	<bean name="sentenceDao" class="edu.ucsd.dao.Neo4JSentenceDaoImpl"/>
 	<bean name="parser" class="edu.ucsd.parser.DisneyParser"/>
 </beans>

@@ -1,0 +1,11 @@
+ontologyConfiguration:
+   # Indicated the path containing the neo4j graph. 
+   # Note that if a graph exists in this location the loader will append to the existing graph
+   graphLocation: /Users/rogertan/FinalProject/ontology/graph.db
+
+ontologyUrls:
+  # URLs to load into the graph
+  # They can be local paths:
+  - /Users/rogertan/FinalProject/NLPNeo4J/src/main/resources/DOLCE2.0-Lite-v3.owl
+  # Remote URLs
+  # This can be any format that owl-api can read

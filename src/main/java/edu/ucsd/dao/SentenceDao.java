@@ -29,4 +29,5 @@ public interface SentenceDao {
 	public void save(DocumentToSentence documentToSentence);
 	public Document getDocumentByTitleYearAndNumber(String title, int year, int documentNumber);
 	public List<Sentence> getSentencesBasedOnDocument(Long documentId);
+	public List<Word> getWordsWithNeTag(String neTag);
 }

@@ -20,4 +20,7 @@ public interface SentenceRepository extends GraphRepository<Sentence> {
 
 	@Query("start d = node:__types__(className=\"_Document\"), s = node:__types__(className=\"_Sentence\") match (d)-[:HAS_SENTENCE]->(s) where id(d) = {0} return s order by s.sNum")
 	public List<Sentence> getSentencesBasedOnDocument(Long documentId);
+	
+	@Query("start w = node:__types__(className=\"_Word\") where w.text <> \"ROOT\" and w.neTag = {0} return w")
+	public List<Word> getWordsWithNeTag(String neTag);
 }

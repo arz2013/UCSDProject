@@ -26,7 +26,7 @@
 	<bean id="graphDbFactory" class="org.neo4j.graphdb.factory.GraphDatabaseFactory"/>
  
 	<bean id="graphDbBuilder" factory-bean="graphDbFactory" factory-method="newEmbeddedDatabaseBuilder">
-		<constructor-arg value="target/data/graph.db"/>
+		<constructor-arg value="graph.db"/>
 	</bean>
  
 	<bean id="graphDbBuilderFinal" factory-bean="graphDbBuilder" factory-method="setConfig">
@@ -35,6 +35,6 @@
  
 	<bean id="graphDatabaseService" factory-bean="graphDbBuilderFinal" factory-method="newGraphDatabase" destroy-method="shutdown" /> 
 	<bean name="sentenceDao" class="edu.ucsd.dao.Neo4JSentenceDaoImpl"/>
-	
+	<bean name="ontologyDao" class="edu.ucsd.dao.Neo4JOntologyDaoImpl"/>
 	<bean name="parser" class="edu.ucsd.parser.DisneyParser"/>
 </beans>

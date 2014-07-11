@@ -110,4 +110,9 @@ public class Neo4JSentenceDaoImpl implements SentenceDao {
 	public List<Sentence> getSentencesBasedOnDocument(Long documentId) {
 		return repository.getSentencesBasedOnDocument(documentId);
 	}
+
+	@Override
+	public List<Word> getWordsWithNeTag(String neTag) {
+		return repository.getWordsWithNeTag(neTag);
+	}
 }

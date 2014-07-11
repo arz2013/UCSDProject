@@ -29,4 +29,16 @@ public class WordToOntologyClass {
 		this.word = word;
 		this.node = node;
 	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public Word getWord() {
+		return word;
+	}
+
+	public Node getNode() {
+		return node;
+	}
 }

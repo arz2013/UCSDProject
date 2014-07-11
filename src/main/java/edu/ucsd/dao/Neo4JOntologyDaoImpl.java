@@ -1,11 +1,12 @@
 package edu.ucsd.dao;
 
+import java.util.HashMap;
+
 import javax.inject.Inject;
 
 import org.neo4j.graphdb.Node;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 
-import edu.ucsd.model.OntologyEntity;
 import edu.ucsd.model.WordToOntologyClass;
 import edu.ucsd.repository.OntologyRepository;
 
@@ -24,7 +25,9 @@ public class Neo4JOntologyDaoImpl implements OntologyDao {
 	@Override
 	public void saveWordToOntologyAssociation(WordToOntologyClass assoc) {
 		if(assoc != null) {
-			template.save(assoc);
+			// We have to do this because of a conflict between Spring and the Ontology classes
+			Node word = template.getNode(assoc.getWord().getId());
+			template.createRelationshipBetween(word, assoc.getNode(), "HAS_ONTOLOGY_RELATION", new HashMap<String, Object>());
 		}
 	}
 	

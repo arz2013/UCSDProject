@@ -145,14 +145,4 @@ public class Neo4JSentenceDaoImpl implements SentenceDao {
 			
 		};
 	}
-
-	@Override
-	public NonLeafParseNode getPrecedingNonLeafParseNode(Long id) {
-		return this.repository.getPrecedingNonLeafParseNode(id);
-	}
-	
-	@Override
-	public Node getPrecedingNonLeafParseNodeAsNode(Long id) {
-		return this.repository.getPrecedingNonLeafParseNodeAsNode(id);
-	}
 }

@@ -17,6 +17,7 @@ import edu.ucsd.model.NeTags;
 import edu.ucsd.model.NonLeafParseNode;
 import edu.ucsd.model.Rel;
 import edu.ucsd.system.SystemApplicationContext;
+import edu.ucsd.utils.Neo4JUtils;
 
 public class CommonAncestor {
 	public static void main(String[] args) {
@@ -37,8 +38,9 @@ public class CommonAncestor {
 					System.out.println("Common Ancestor: " + lca.getId() + ", " + lca.getProperty("value"));
 				} else { // There must only be one node in the list so lowestCommonAncestor does not work
 					Node onlyOne = nextPhrase.get(0);
-					Node parent = sentenceDao.getPrecedingNonLeafParseNodeAsNode(onlyOne.getId());
-					System.out.println("Common Ancestor: " + parent.getId() + ", " + parent.getProperty("value"));
+					Node parent = Neo4JUtils.getAncestor(onlyOne, Traversal.expanderForTypes(Rel.HAS_PARSE_CHILD, Direction.INCOMING));
+					Node grandParent = Neo4JUtils.getAncestor(parent, Traversal.expanderForTypes(Rel.HAS_PARSE_CHILD, Direction.INCOMING));
+					System.out.println("Common Ancestor: " + grandParent.getId() + ", " + grandParent.getProperty("value"));
 				}
 			}
 		}

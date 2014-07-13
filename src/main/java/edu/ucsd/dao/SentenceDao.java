@@ -34,5 +34,26 @@ public interface SentenceDao {
 	public Document getDocumentByTitleYearAndNumber(String title, int year, int documentNumber);
 	public List<Sentence> getSentencesBasedOnDocument(Long documentId);
 	public List<Word> getWordsWithNeTag(String neTag);
-	public Iterable<Map<String, Object>> getWordsKeyedBySentenceNumberWithSpecificNeTag(NeTags neTag);
+	public Iterable<SentenceNumberAndWords> getWordsKeyedBySentenceNumberWithSpecificNeTag(NeTags neTag);
+	
+	public static class SentenceNumberAndWords {
+		private int sentenceNumber;
+		private List<Node> words;
+		
+		public SentenceNumberAndWords(int sentenceNumber, List<Node> words) {
+			if(words == null) {
+				throw new IllegalArgumentException("List of words can't be null");
+			}
+			this.sentenceNumber = sentenceNumber;
+			this.words = words;
+		}
+
+		public int getSentenceNumber() {
+			return sentenceNumber;
+		}
+
+		public List<Node> getWords() {
+			return words;
+		}
+	}
 }

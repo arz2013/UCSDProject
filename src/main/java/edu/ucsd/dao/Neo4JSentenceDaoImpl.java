@@ -1,12 +1,12 @@
 package edu.ucsd.dao;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.neo4j.graphdb.Node;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 
 import edu.ucsd.model.Document;
@@ -120,7 +120,29 @@ public class Neo4JSentenceDaoImpl implements SentenceDao {
 	}
 
 	@Override
-	public Iterable<Map<String, Object>> getWordsKeyedBySentenceNumberWithSpecificNeTag(NeTags neTag) {
-		return repository.getWordsKeyedBySentenceNumberWithSpecificNeTag(neTag);
+	public Iterable<SentenceNumberAndWords> getWordsKeyedBySentenceNumberWithSpecificNeTag(NeTags neTag) {
+		final Iterator<Map<String, Object>> iterator = repository.getWordsKeyedBySentenceNumberWithSpecificNeTag(neTag).iterator();
+		return new Iterable<SentenceNumberAndWords>() {
+
+			@Override
+			public Iterator<SentenceNumberAndWords> iterator() {
+				// TODO Auto-generated method stub
+				return new Iterator<SentenceNumberAndWords>() {
+
+					@Override
+					public boolean hasNext() {
+						return iterator.hasNext();
+					}
+
+					@SuppressWarnings("unchecked")
+					@Override
+					public SentenceNumberAndWords next() {
+						Map<String, Object> entry = iterator.next();
+						return new SentenceNumberAndWords((Integer)entry.get("sentenceNumber"), (List<Node>)entry.get("words"));
+					}	
+				};
+			}
+			
+		};
 	}
 }

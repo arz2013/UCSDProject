@@ -35,6 +35,8 @@ public interface SentenceDao {
 	public List<Sentence> getSentencesBasedOnDocument(Long documentId);
 	public List<Word> getWordsWithNeTag(String neTag);
 	public Iterable<SentenceNumberAndWords> getWordsKeyedBySentenceNumberWithSpecificNeTag(NeTags neTag);
+	public NonLeafParseNode getPrecedingNonLeafParseNode(Long id);
+	public Node getPrecedingNonLeafParseNodeAsNode(Long id);
 	
 	public static class SentenceNumberAndWords {
 		private int sentenceNumber;

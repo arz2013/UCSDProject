@@ -14,11 +14,22 @@ import org.springframework.context.ApplicationContext;
 import static edu.ucsd.dao.SentenceDao.SentenceNumberAndWords;
 import edu.ucsd.dao.SentenceDao;
 import edu.ucsd.model.NeTags;
-import edu.ucsd.model.NonLeafParseNode;
 import edu.ucsd.model.Rel;
 import edu.ucsd.system.SystemApplicationContext;
 import edu.ucsd.utils.Neo4JUtils;
 
+/**
+ * This class is not intended to be some sort of common utility to find common ancestors of Nodes, etc, 
+ * rather, it's just another processing logic where find the common ancestor in the parse tree of certain
+ * phrases in a sentence. For example: The Walt Disney Company (occuring in a sentence) as parsed by the Stanford Parser 
+ * will produce the following: (NP (DT The) (NNP Walt) (NNP Disney) (NNP Company)). From the example it's clear
+ * that the common ancestor is the NP tag which is represented in our data model as a NonLeafParseNode
+ * What this class will do then is find such NP nodes and add populate the type property of those nodes 
+ * with the value "NP" so custom indexing can be done later. 
+ * 
+ * @author rogertan
+ *
+ */
 public class CommonAncestor {
 	public static void main(String[] args) {
 		ApplicationContext context = SystemApplicationContext.getApplicationContext();

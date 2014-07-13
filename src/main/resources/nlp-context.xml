@@ -16,10 +16,10 @@
      					   http://www.springframework.org/schema/tx/spring-tx.xsd">
     <neo4j:config graphDatabaseService="graphDatabaseService"  base-package="edu.ucsd.model"/>
     <neo4j:repositories base-package="edu.ucsd.repository"/>
-    <context:component-scan base-package="edu.ucsd"/>
     <context:component-scan base-package="edu.ucsd.dao"/>
     <context:component-scan base-package="edu.ucsd.mapper"/>
     <context:component-scan base-package="edu.ucsd.parser"/>
+    <context:component-scan base-package="edu.ucsd.processing"/>
     <tx:annotation-driven/>
     <util:map id="config">
 		<entry key="enable_remote_shell" value="true"/>
@@ -39,9 +39,11 @@
 	<bean name="sentenceDao" class="edu.ucsd.dao.Neo4JSentenceDaoImpl"/>
 	<bean name="ontologyDao" class="edu.ucsd.dao.Neo4JOntologyDaoImpl"/>
 	<bean name="parser" class="edu.ucsd.parser.DisneyParser"/>
+	<bean name="commonAncestor" class="edu.ucsd.processing.CommonAncestor"/>
+	<bean name="processingMain" class="edu.ucsd.processing.ProcessingMain"/>
 	
 	<!-- Mappers -->
-	<bean name="mappingUtil" class="edu.ucsd.MappingUtil">
+	<bean name="mappingUtil" class="edu.ucsd.processing.MappingUtil">
 		<property name="mappers">
 			<list>
             	<ref bean="personToNaturalPersonMapper" />

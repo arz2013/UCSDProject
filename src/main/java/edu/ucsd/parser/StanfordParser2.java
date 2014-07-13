@@ -4,6 +4,7 @@ import static com.google.inject.spring.SpringIntegration.fromSpring;
 import edu.ucsd.dao.SentenceDao;
 import edu.ucsd.model.Document;
 import edu.ucsd.system.SystemApplicationContext;
+import edu.ucsd.utils.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -24,44 +25,8 @@ import com.google.inject.Injector;
 
 public class StanfordParser2 {
 	private static Logger logger = LoggerFactory.getLogger(StanfordParser2.class);
-	
-	private static List<String> readDisneyFinancialStatement() throws IOException {
-		InputStream is = SentenceBreaker.class.getClassLoader().getResourceAsStream("DFS.txt");
-		BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-		StringBuilder sb = new StringBuilder();
-		String inputLine; 
-		while((inputLine = br.readLine()) != null) {
-			sb.append(inputLine);
-		}
 		
-		int count = 0;		
-		String paragraph = sb.toString();
-		List<String> sentences = new ArrayList<String>();
-		BreakIterator boundary = BreakIterator.getSentenceInstance();
-		boundary.setText(paragraph);
-		String previous = "";
-		int start = boundary.first();
-	    for (int end = boundary.next();
-	          end != BreakIterator.DONE;
-	          start = end, end = boundary.next()) {
-	    	  String text = paragraph.substring(start, end);
-	    	  if (text.startsWith("Banks from Walt Disney Studios.") || text.startsWith("It will continue to grow as long as there is imagination left")) {
-	    		  previous = previous.concat(text.trim());
-	    		  sentences.set(count - 1, previous);
-	    	  } else {
-	    		  sentences.add(text.trim());
-	    		  count++;
-	    	  }
-	    	  
-	          previous = text;
-	    }
-
-	    return sentences;
-	}
-	
-	
 	private static class SpringModule extends AbstractModule {
-
 		@Override
 		protected void configure() {
 			bind(BeanFactory.class).toInstance(SystemApplicationContext.getApplicationContext());	
@@ -75,7 +40,7 @@ public class StanfordParser2 {
 		stopWatch.start();
 		Injector injector = Guice.createInjector(new SpringModule());
 		
-		List<String> disneyFinancialStatement = readDisneyFinancialStatement();	
+		List<String> disneyFinancialStatement = FileUtils.readDisneyFinancialStatement("DFS.txt");	
 		DisneyParser parser = injector.getInstance(DisneyParser.class);
 		parser.parseAndLoad(disneyFinancialStatement, new Document("Disney Financial Statement", 2013, 0));
 		

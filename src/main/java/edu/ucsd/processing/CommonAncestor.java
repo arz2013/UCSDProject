@@ -1,9 +1,11 @@
-package edu.ucsd;
+package edu.ucsd.processing;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import org.neo4j.graphalgo.impl.ancestor.AncestorsUtil;
 import org.neo4j.graphdb.Direction;
@@ -18,6 +20,9 @@ import edu.ucsd.model.Rel;
 import edu.ucsd.system.SystemApplicationContext;
 import edu.ucsd.utils.Neo4JUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class is not intended to be some sort of common utility to find common ancestors of Nodes, etc, 
  * rather, it's just another processing logic where find the common ancestor in the parse tree of certain
@@ -31,6 +36,11 @@ import edu.ucsd.utils.Neo4JUtils;
  *
  */
 public class CommonAncestor {
+	private static Logger logger = LoggerFactory.getLogger(CommonAncestor.class);
+	
+	@Inject
+	private SentenceDao sentenceDao;
+	
 	public static void main(String[] args) {
 		ApplicationContext context = SystemApplicationContext.getApplicationContext();
 		SentenceDao sentenceDao = SentenceDao.class.cast(context.getBean("sentenceDao"));
@@ -38,25 +48,35 @@ public class CommonAncestor {
 		int countWords = 0;
 		for(SentenceNumberAndWords sentenceNumberAndWords : sentenceNumbersAndWords) {
 			PhraseTokenizer tokenizer = new PhraseTokenizer(sentenceNumberAndWords.getWords());
-			System.out.println("Sentence Number : " + sentenceNumberAndWords.getSentenceNumber());
-			System.out.println("Original Words  : " + sentenceNumberAndWords.getWords());
+			if(logger.isDebugEnabled()) {
+				logger.debug("Sentence Number : " + sentenceNumberAndWords.getSentenceNumber());
+				logger.debug("Original Words  : " + sentenceNumberAndWords.getWords());
+			}
 			while(tokenizer.hasNext()) {
 				List<Node> nextPhrase = tokenizer.nextPhrase();
 				countWords += nextPhrase.size();
-				System.out.println("Next Phrase: " + nextPhrase);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Next Phrase: " + nextPhrase);
+				}
 				Node lca = AncestorsUtil.lowestCommonAncestor(nextPhrase, Traversal.expanderForTypes(Rel.HAS_PARSE_CHILD, Direction.INCOMING));
 				if (lca != null) {
-					System.out.println("Common Ancestor: " + lca.getId() + ", " + lca.getProperty("value"));
+					if(logger.isDebugEnabled()) {
+						logger.debug("Common Ancestor: " + lca.getId() + ", " + lca.getProperty("value"));
+					}
 				} else { // There must only be one node in the list so lowestCommonAncestor does not work
 					Node onlyOne = nextPhrase.get(0);
 					Node parent = Neo4JUtils.getAncestor(onlyOne, Traversal.expanderForTypes(Rel.HAS_PARSE_CHILD, Direction.INCOMING));
 					Node grandParent = Neo4JUtils.getAncestor(parent, Traversal.expanderForTypes(Rel.HAS_PARSE_CHILD, Direction.INCOMING));
-					System.out.println("Common Ancestor: " + grandParent.getId() + ", " + grandParent.getProperty("value"));
+					if(logger.isDebugEnabled()) {
+						logger.debug("Common Ancestor: " + grandParent.getId() + ", " + grandParent.getProperty("value"));
+					}
 				}
 			}
 		}
 		
-		System.out.println("Number of words: " + countWords);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Number of words: " + countWords);
+		}
 	}
 	
 	private static class PhraseTokenizer {

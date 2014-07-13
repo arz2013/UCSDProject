@@ -10,10 +10,13 @@ import edu.ucsd.utils.Constants;
 @NodeEntity
 @TypeAlias("_NonLeafParseNode")
 public class NonLeafParseNode {
+	public static String TYPE_FIELD = "type";
+	
 	@GraphId
 	private Long id;
 	
 	private String value;
+	private String type = ""; // Spring can populate this later
 	
 	private NonLeafParseNode() {
 	}

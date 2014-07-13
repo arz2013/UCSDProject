@@ -1,10 +1,12 @@
 package edu.ucsd.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
+import edu.ucsd.model.NeTags;
 import edu.ucsd.model.Sentence;
 import edu.ucsd.model.Word;
 
@@ -23,4 +25,7 @@ public interface SentenceRepository extends GraphRepository<Sentence> {
 	
 	@Query("start w = node:__types__(className=\"_Word\") where w.text <> \"ROOT\" and w.neTag = {0} return w")
 	public List<Word> getWordsWithNeTag(String neTag);
+
+	@Query("start s = node:__types__(className=\"_Sentence\"), w = node:__types__(className=\"_Word\") match (s)-[:HAS_WORD]->(w) where w.text <> \"ROOT\" and w.neTag = {0} return s.sNum as sentenceNumber, collect(w) as words")
+	public Iterable<Map<String, Object>> getWordsKeyedBySentenceNumberWithSpecificNeTag(NeTags neTag);
 }

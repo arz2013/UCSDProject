@@ -1,9 +1,13 @@
 package edu.ucsd.dao;
 
 import java.util.List;
+import java.util.Map;
+
+import org.neo4j.graphdb.Node;
 
 import edu.ucsd.model.Document;
 import edu.ucsd.model.DocumentToSentence;
+import edu.ucsd.model.NeTags;
 import edu.ucsd.model.NonLeafParseNode;
 import edu.ucsd.model.NonLeafToLeaf;
 import edu.ucsd.model.ParseChild;
@@ -30,4 +34,5 @@ public interface SentenceDao {
 	public Document getDocumentByTitleYearAndNumber(String title, int year, int documentNumber);
 	public List<Sentence> getSentencesBasedOnDocument(Long documentId);
 	public List<Word> getWordsWithNeTag(String neTag);
+	public Iterable<Map<String, Object>> getWordsKeyedBySentenceNumberWithSpecificNeTag(NeTags neTag);
 }

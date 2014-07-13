@@ -1,14 +1,17 @@
 package edu.ucsd.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.neo4j.graphdb.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 
 import edu.ucsd.model.Document;
 import edu.ucsd.model.DocumentToSentence;
+import edu.ucsd.model.NeTags;
 import edu.ucsd.model.NonLeafParseNode;
 import edu.ucsd.model.NonLeafToLeaf;
 import edu.ucsd.model.ParseChild;
@@ -114,5 +117,10 @@ public class Neo4JSentenceDaoImpl implements SentenceDao {
 	@Override
 	public List<Word> getWordsWithNeTag(String neTag) {
 		return repository.getWordsWithNeTag(neTag);
+	}
+
+	@Override
+	public Iterable<Map<String, Object>> getWordsKeyedBySentenceNumberWithSpecificNeTag(NeTags neTag) {
+		return repository.getWordsKeyedBySentenceNumberWithSpecificNeTag(neTag);
 	}
 }

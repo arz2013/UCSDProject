@@ -18,6 +18,7 @@ public class UCSDProject {
 		*/
 		MappingUtil mapper = MappingUtil.class.cast(context.getBean("mappingUtil"));
 		mapper.map();
+	
 	}
 
 }

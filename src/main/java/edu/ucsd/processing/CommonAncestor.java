@@ -11,13 +11,13 @@ import org.neo4j.graphalgo.impl.ancestor.AncestorsUtil;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.kernel.Traversal;
-import org.springframework.context.ApplicationContext;
 
 import static edu.ucsd.dao.SentenceDao.SentenceNumberAndWords;
 import edu.ucsd.dao.SentenceDao;
 import edu.ucsd.model.NeTags;
+import edu.ucsd.model.NonLeafParseNode;
+import edu.ucsd.model.ParseTreeTags;
 import edu.ucsd.model.Rel;
-import edu.ucsd.system.SystemApplicationContext;
 import edu.ucsd.utils.Neo4JUtils;
 
 import org.slf4j.Logger;
@@ -41,9 +41,7 @@ public class CommonAncestor {
 	@Inject
 	private SentenceDao sentenceDao;
 	
-	public static void main(String[] args) {
-		ApplicationContext context = SystemApplicationContext.getApplicationContext();
-		SentenceDao sentenceDao = SentenceDao.class.cast(context.getBean("sentenceDao"));
+	public void findNPAncestorNodeAndMark() {
 		Iterable<SentenceNumberAndWords> sentenceNumbersAndWords = sentenceDao.getWordsKeyedBySentenceNumberWithSpecificNeTag(NeTags.ORGANIZATION);
 		int countWords = 0;
 		for(SentenceNumberAndWords sentenceNumberAndWords : sentenceNumbersAndWords) {
@@ -63,6 +61,7 @@ public class CommonAncestor {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Common Ancestor: " + lca.getId() + ", " + lca.getProperty("value"));
 					}
+					lca.setProperty(NonLeafParseNode.TYPE_FIELD, ParseTreeTags.NP.name());
 				} else { // There must only be one node in the list so lowestCommonAncestor does not work
 					Node onlyOne = nextPhrase.get(0);
 					Node parent = Neo4JUtils.getAncestor(onlyOne, Traversal.expanderForTypes(Rel.HAS_PARSE_CHILD, Direction.INCOMING));
@@ -70,6 +69,7 @@ public class CommonAncestor {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Common Ancestor: " + grandParent.getId() + ", " + grandParent.getProperty("value"));
 					}
+					grandParent.setProperty(NonLeafParseNode.TYPE_FIELD, ParseTreeTags.NP.name());
 				}
 			}
 		}

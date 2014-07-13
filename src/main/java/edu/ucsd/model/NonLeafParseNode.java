@@ -16,6 +16,7 @@ public class NonLeafParseNode {
 	private Long id;
 	
 	private String value;
+	
 	private String type = ""; // Spring can populate this later
 	
 	private NonLeafParseNode() {
@@ -32,6 +33,10 @@ public class NonLeafParseNode {
 	
 	public String getValue() {
 		return this.value;
+	}
+	
+	public String getType() {
+		return this.type;
 	}
 
 	public boolean isRoot() {

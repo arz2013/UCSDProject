@@ -7,6 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import edu.ucsd.ontologymapper.WordsToOntologyClassMapper;
 
 // Temporary class just for prototyping
+/**
+ * 1. Maps words whose NETag is PERSON to an OWLClass of Natural-Person
+ * 2. Maps words whose NETag is ORGANIZATION to an OWLCLass of Organization
+ * 
+ * @author rogertan
+ *
+ */
 public class MappingUtil {
 	private List<WordsToOntologyClassMapper> mappers;
 	

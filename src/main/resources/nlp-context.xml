@@ -19,6 +19,7 @@
     <context:component-scan base-package="edu.ucsd.dao"/>
     <context:component-scan base-package="edu.ucsd.mapper"/>
     <context:component-scan base-package="edu.ucsd.parser"/>
+    <context:component-scan base-package="edu.ucsd.patternmatching"/>
     <context:component-scan base-package="edu.ucsd.processing"/>
     <tx:annotation-driven/>
     <util:map id="config">
@@ -36,6 +37,7 @@
 	</bean>
  
 	<bean id="graphDatabaseService" factory-bean="graphDbBuilderFinal" factory-method="newGraphDatabase" destroy-method="shutdown" /> 
+	<bean name="patternMatcher" class="edu.ucsd.patternmatching.PatternMatcher"/>
 	<bean name="sentenceDao" class="edu.ucsd.dao.Neo4JSentenceDaoImpl"/>
 	<bean name="ontologyDao" class="edu.ucsd.dao.Neo4JOntologyDaoImpl"/>
 	<bean name="parser" class="edu.ucsd.parser.DisneyParser"/>

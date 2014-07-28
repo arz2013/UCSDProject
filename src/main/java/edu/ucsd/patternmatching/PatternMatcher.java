@@ -65,42 +65,41 @@ public class PatternMatcher {
 		collectPenultimateNodes(node, node);
 		logger.info("Text : " + node.getProperty("text"));
 		for(Node candidateNode : this.sentenceNodeToPenultimateParseTreeNodes.get(node)) {
-			printCandidateNode(candidateNode);
+			StringBuilder sb = new StringBuilder();
+			candidateNodeAsString(candidateNode, sb);
+			logger.info(sb.toString());
 		}
 	}
 	
-	private void printCandidateNode(Node candidateNode) {
+	private void candidateNodeAsString(Node candidateNode, StringBuilder sb) {
 		List<Node> candidateNodeWords = new ArrayList<Node>();
 		Iterable<Relationship> parseChildren = candidateNode.getRelationships(Direction.OUTGOING, Rel.HAS_PARSE_CHILD);
+
+		sb.append("(");
+		sb.append(candidateNode.getProperty("value"));
+		sb.append(" ");
+	
 		for(Relationship parseChild : parseChildren) {
-			Node word = parseChild.getEndNode().getRelationships(Direction.OUTGOING, Rel.HAS_PARSE_CHILD).iterator().next().getEndNode();
-			logger.info(" Parse Child: " + parseChild.getEndNode().getId());
-			if(word.hasProperty("text")) {
-				candidateNodeWords.add(word);
-			}
+			Node child = parseChild.getEndNode();
+			candidateNodeWords.add(child);
 		}
 		Collections.sort(candidateNodeWords, new Comparator<Node>() {
 			@Override
 			public int compare(Node o1, Node o2) {
-				Integer wordPosition1 = (Integer)o1.getProperty("position");
-				Integer wordPosition2 = (Integer)o2.getProperty("position");
-				return wordPosition1.compareTo(wordPosition2);
+				return new Long(o1.getId()).compareTo(o2.getId());
 			}
 			
 		});
-		StringBuilder sb = new StringBuilder();
-		sb.append("(");
-		sb.append(candidateNode.getProperty("value"));
-		sb.append(" ");
-		for(Node word : candidateNodeWords) {
-			sb.append("(");
-			sb.append(word.getProperty("posTag"));
-			sb.append(" ");
-			sb.append(word.getProperty("text"));
-			sb.append(")");
+		
+		for(Node node : candidateNodeWords) {
+			if(node.hasProperty("text")) {
+				sb.append(node.getProperty("text"));
+			} else {
+				candidateNodeAsString(node, sb);
+			}
 		}
+		
 		sb.append(")");
-		logger.info(sb.toString());
 	}
 
 	public void performMatching(Document document) {

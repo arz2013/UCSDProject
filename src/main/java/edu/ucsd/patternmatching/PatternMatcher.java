@@ -20,8 +20,6 @@ import org.springframework.data.neo4j.support.Neo4jTemplate;
 
 import edu.ucsd.model.Document;
 import edu.ucsd.model.Rel;
-import edu.ucsd.model.SpecialTokens;
-import edu.ucsd.model.Word;
 
 public class PatternMatcher {
 	private static Logger logger = LoggerFactory.getLogger(PatternMatcher.class);
@@ -35,28 +33,23 @@ public class PatternMatcher {
 	}
 	
 	private void collectPenultimateNodes(Node sentence, Node startNode) {
-		boolean penultimateNode = true;
 		Iterable<Relationship> parseChildren = startNode.getRelationships(Direction.OUTGOING, Rel.HAS_PARSE_CHILD);
 		if(parseChildren.iterator().hasNext()) {
 			for(Relationship parseChild : parseChildren) {
 				Iterable<Relationship> parseGrandChildren = parseChild.getEndNode().getRelationships(Direction.OUTGOING, Rel.HAS_PARSE_CHILD);
 				if(parseGrandChildren.iterator().hasNext()) {
 					for(Relationship parseGrandChild : parseGrandChildren) {
-						if(parseGrandChild.getEndNode().hasRelationship(Direction.OUTGOING, Rel.HAS_PARSE_CHILD)) {
-							penultimateNode = false;
+						if(!parseGrandChild.getEndNode().hasRelationship(Direction.OUTGOING, Rel.HAS_PARSE_CHILD)) {
+							Set<Node> candidateNodes = this.sentenceNodeToPenultimateParseTreeNodes.get(sentence);
+							candidateNodes.add(startNode);
 						}
-					}
-					
-					if(penultimateNode) {
-						Set<Node> candidateNodes = this.sentenceNodeToPenultimateParseTreeNodes.get(sentence);
-						candidateNodes.add(startNode);
-					}
-				}
-				
-				if(!penultimateNode) {
-					collectPenultimateNodes(sentence, parseChild.getEndNode());
+					}					
 				}
 			} 
+		}
+		parseChildren = startNode.getRelationships(Direction.OUTGOING, Rel.HAS_PARSE_CHILD);
+		for(Relationship parseChild : parseChildren) {
+			collectPenultimateNodes(sentence, parseChild.getEndNode());
 		}
 	}
 	
@@ -66,9 +59,43 @@ public class PatternMatcher {
 		logger.info("Text : " + node.getProperty("text"));
 		for(Node candidateNode : this.sentenceNodeToPenultimateParseTreeNodes.get(node)) {
 			StringBuilder sb = new StringBuilder();
-			candidateNodeAsString(candidateNode, sb);
+			candidateNodeAsString(candidateNode);
 			logger.info(sb.toString());
 		}
+	}
+	
+	private void candidateNodeAsString(Node candidateNode) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("(");
+		sb.append(candidateNode.getProperty("value"));
+		sb.append(" ");
+		List<Node> candidateNodeWords = new ArrayList<Node>();
+		Iterable<Relationship> parseChildren = candidateNode.getRelationships(Direction.OUTGOING, Rel.HAS_PARSE_CHILD);
+		for(Relationship parseChild : parseChildren) {
+			Node child = parseChild.getEndNode();
+			candidateNodeWords.add(child);
+		}
+		Collections.sort(candidateNodeWords, new Comparator<Node>() {
+			@Override
+			public int compare(Node o1, Node o2) {
+				return new Long(o1.getId()).compareTo(o2.getId());
+			}
+		});
+		for(Node node : candidateNodeWords) {
+			Iterable<Relationship> parseGrandChildren = node.getRelationships(Direction.OUTGOING, Rel.HAS_PARSE_CHILD);
+			for(Relationship parseGrandChild : parseGrandChildren) {
+				if(parseGrandChild.getEndNode().hasProperty("text")) {
+					sb.append("(");
+					sb.append(node.getProperty("value"));
+					sb.append(" ");
+					sb.append(parseGrandChild.getEndNode().getProperty("text"));
+					sb.append(")");
+				}
+			}
+		}
+		sb.append(")");
+		logger.info(sb.toString());
+		
 	}
 	
 	private void candidateNodeAsString(Node candidateNode, StringBuilder sb) {
@@ -109,6 +136,7 @@ public class PatternMatcher {
 		for(Relationship relationship : sentences) {
 			performMatchingSentence(relationship.getEndNode());
 			numberOfSentences++;
+			
 		}
 		logger.info("Number of sentences:" + numberOfSentences);
 	}

@@ -21,14 +21,14 @@ import org.springframework.data.neo4j.support.Neo4jTemplate;
 import edu.ucsd.model.Document;
 import edu.ucsd.model.Rel;
 
-public class PatternMatcher {
-	private static Logger logger = LoggerFactory.getLogger(PatternMatcher.class);
+public class PenultimateParseTreeNodeMatcher {
+	private static Logger logger = LoggerFactory.getLogger(PenultimateParseTreeNodeMatcher.class);
 	private Map<Node, Set<Node>> sentenceNodeToPenultimateParseTreeNodes;
 	
 	@Inject
 	private Neo4jTemplate template;
 	
-	public PatternMatcher() {
+	public PenultimateParseTreeNodeMatcher() {
 		sentenceNodeToPenultimateParseTreeNodes = new HashMap<Node, Set<Node>>();
 	}
 	

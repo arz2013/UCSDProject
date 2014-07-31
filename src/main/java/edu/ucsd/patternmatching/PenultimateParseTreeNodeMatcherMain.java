@@ -9,14 +9,14 @@ import edu.ucsd.system.SystemApplicationContext;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-public class PatternMatchingMain {
-	private static Logger logger = LoggerFactory.getLogger(PatternMatchingMain.class);
+public class PenultimateParseTreeNodeMatcherMain {
+	private static Logger logger = LoggerFactory.getLogger(PenultimateParseTreeNodeMatcherMain.class);
 
 	public static void main(String[] args) {
 		ApplicationContext context = SystemApplicationContext.getApplicationContext();
 		SentenceDao sentenceDao = SentenceDao.class.cast(context.getBean("sentenceDao"));
 		Document doc = sentenceDao.getDocumentByTitleYearAndNumber("Disney Financial Statement", 2013, 0);
-		PatternMatcher matcher = PatternMatcher.class.cast(context.getBean("patternMatcher"));
+		PenultimateParseTreeNodeMatcher matcher = PenultimateParseTreeNodeMatcher.class.cast(context.getBean("penultimateMatcher"));
 		matcher.performMatching(doc);
 	}
 

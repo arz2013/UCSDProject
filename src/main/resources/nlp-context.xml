@@ -37,7 +37,7 @@
 	</bean>
  
 	<bean id="graphDatabaseService" factory-bean="graphDbBuilderFinal" factory-method="newGraphDatabase" destroy-method="shutdown" /> 
-	<bean name="patternMatcher" class="edu.ucsd.patternmatching.PatternMatcher"/>
+	<bean name="penultimateMatcher" class="edu.ucsd.patternmatching.PenultimateParseTreeNodeMatcher"/>
 	<bean name="activeVerbSearch" class="edu.ucsd.patternmatching.ActiveVerbSearch"/>
 	<bean name="sentenceDao" class="edu.ucsd.dao.Neo4JSentenceDaoImpl"/>
 	<bean name="ontologyDao" class="edu.ucsd.dao.Neo4JOntologyDaoImpl"/>

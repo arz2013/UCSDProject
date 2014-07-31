@@ -98,37 +98,6 @@ public class PatternMatcher {
 		
 	}
 	
-	private void candidateNodeAsString(Node candidateNode, StringBuilder sb) {
-		List<Node> candidateNodeWords = new ArrayList<Node>();
-		Iterable<Relationship> parseChildren = candidateNode.getRelationships(Direction.OUTGOING, Rel.HAS_PARSE_CHILD);
-
-		sb.append("(");
-		sb.append(candidateNode.getProperty("value"));
-		sb.append(" ");
-	
-		for(Relationship parseChild : parseChildren) {
-			Node child = parseChild.getEndNode();
-			candidateNodeWords.add(child);
-		}
-		Collections.sort(candidateNodeWords, new Comparator<Node>() {
-			@Override
-			public int compare(Node o1, Node o2) {
-				return new Long(o1.getId()).compareTo(o2.getId());
-			}
-			
-		});
-		
-		for(Node node : candidateNodeWords) {
-			if(node.hasProperty("text")) {
-				sb.append(node.getProperty("text"));
-			} else {
-				candidateNodeAsString(node, sb);
-			}
-		}
-		
-		sb.append(")");
-	}
-
 	public void performMatching(Document document) {
 		Node documentNode = template.getNode(document.getId());
 		Iterable<Relationship> sentences = documentNode.getRelationships(Direction.OUTGOING, Rel.HAS_SENTENCE);

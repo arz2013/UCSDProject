@@ -22,9 +22,18 @@ public class TregexMain {
 		while (m.find()) {
 			m.getMatch().pennPrint();
 		}
-		p = TregexPattern.compile("NP < ((NP < (NNP $+ /,/ $++ NNP $+ /,/)) $+ CC $++ (NP < (NNP $++ POS)))");
+		p = TregexPattern.compile("NP < (DT $+ NNP=organization)");
 		m = p.matcher(t);
 		while (m.find()) {
+			m.getMatch().pennPrint();
+			logger.info("Node names: " + m.getNodeNames());
+			Tree org = m.getNode("organization");
+			org.pennPrint();
+		}
+		p = TregexPattern.compile("NP < ((NP < (((NNP $. /,/) $.. NNP) $. /,/)) $. CC $ (NP < (NNP $. POS)))");
+		m = p.matcher(t);
+		while (m.find()) {
+			logger.info("Here's the match");
 			m.getMatch().pennPrint();
 		}
 		p = TregexPattern.compile("NP < (NNP $+ /,/ $++ NNP $+ /,/)");

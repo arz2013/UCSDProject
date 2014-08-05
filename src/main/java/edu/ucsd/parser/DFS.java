@@ -1,14 +1,19 @@
 package edu.ucsd.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.neo4j.graphdb.Node;
+import org.springframework.data.neo4j.support.Neo4jTemplate;
 
 import edu.stanford.nlp.trees.Tree;
 import edu.ucsd.dao.SentenceDao;
 import edu.ucsd.model.NonLeafParseNode;
 import edu.ucsd.model.NonLeafToLeaf;
 import edu.ucsd.model.ParseChild;
+import edu.ucsd.model.Rel;
 import edu.ucsd.model.Sentence;
 import edu.ucsd.model.SentenceToNonLeafParseNode;
 import edu.ucsd.model.Word;
@@ -17,15 +22,20 @@ public class DFS {
 	private SentenceDao sentenceDao;
 	private Sentence sentence;
 	private Map<Word.TextAndPosition, Word> seenWords;
+	private Neo4jTemplate template;
 	
 	private boolean isExcludeRoot = true;
 	
 	private List<String> inOrder = new ArrayList<String>();
 	
-	public DFS(SentenceDao sentenceDao, Sentence sentence, Map<Word.TextAndPosition, Word> seenWords) {
+	public DFS(SentenceDao sentenceDao, Neo4jTemplate template, Sentence sentence, Map<Word.TextAndPosition, Word> seenWords) {
 		if(sentenceDao == null) {
 			throw new IllegalArgumentException("DAO can not be null.");
 		} 
+		
+		if(template == null) {
+			throw new IllegalArgumentException("Template can not be null.");
+		}
 		
 		if(sentence == null) {
 			throw new IllegalArgumentException("Sentence cannot be null.");
@@ -36,6 +46,7 @@ public class DFS {
 		}
 		
 		this.sentenceDao = sentenceDao;
+		this.template = template;
 		this.sentence = sentence;
 		this.seenWords = seenWords;
 	}
@@ -48,7 +59,7 @@ public class DFS {
 		innerDepthFirstTraversal(tree, null);
 	}
 	
-	private void innerDepthFirstTraversal(Tree tree, NonLeafParseNode parent) {
+	private Node innerDepthFirstTraversal(Tree tree, NonLeafParseNode parent) {
 		List<Tree> children = tree.getChildrenAsList();
 		NonLeafParseNode currentNode = NonLeafParseNode.newNonLeafParseNode(tree.value());
 		
@@ -58,7 +69,10 @@ public class DFS {
 			Word word = Word.newWord(tree.value(), inOrder.size());
 			word = seenWords.get(word.getTextAndPosition());
 			sentenceDao.save(new NonLeafToLeaf(parent, word));
-			return;
+			
+			// template.createRelationshipBetween(template.getNode(parent.getId()), template.getNode(word.getId()), Rel.FIRST_CHILD.name(), new HashMap<String, Object>());
+			
+			return template.getNode(word.getId());
 		} else {
 			if(currentNode.isRoot() && !isExcludeRoot) { // Check if the current node is root and whether root needs to be excluded
 				sentenceDao.save(currentNode);			
@@ -72,10 +86,30 @@ public class DFS {
 					sentenceDao.save(new ParseChild(parent, currentNode));
 				}
 			}
+			
 		}
 		
+		int childIndex = 0;
+		Node prevNode = null;
 		for(Tree child : children) {
-			this.innerDepthFirstTraversal(child, currentNode);
+			Node childNode = this.innerDepthFirstTraversal(child, currentNode);
+			if(childIndex == 0) {
+				if(currentNode.getId() != null) { // ROOT may not be saved
+					template.createRelationshipBetween(template.getNode(currentNode.getId()), childNode, Rel.FIRST_CHILD.name(), new HashMap<String, Object>());
+				} else {
+					template.createRelationshipBetween(template.getNode(sentence.getId()), childNode, Rel.FIRST_CHILD.name(), new HashMap<String, Object>());
+				}
+			} else {
+				template.createRelationshipBetween(prevNode, childNode, Rel.NEXT.name(), new HashMap<String, Object>());			
+			}
+			prevNode = childNode;
+			childIndex++;
+		}
+		
+		if(currentNode.getId() != null) {
+			return template.getNode(currentNode.getId());
+		} else {
+			return null;
 		}
 	}
 }

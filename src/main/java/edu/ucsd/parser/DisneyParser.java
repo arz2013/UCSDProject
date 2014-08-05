@@ -152,7 +152,7 @@ public class DisneyParser {
 				}
 				
 				// Now save the parse trees as well
-				DFS dfs = new DFS(sentenceDao, newSentence, seenWords);
+				DFS dfs = new DFS(sentenceDao, template, newSentence, seenWords);
 				dfs.performDepthFirstTraversal(tree);
 			
 				noSentence++;

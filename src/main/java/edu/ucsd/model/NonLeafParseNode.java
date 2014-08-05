@@ -42,4 +42,8 @@ public class NonLeafParseNode {
 	public boolean isRoot() {
 		return Constants.ROOT.equals(value);
 	}
+
+	public Long getId() {
+		return this.id;
+	}
 }

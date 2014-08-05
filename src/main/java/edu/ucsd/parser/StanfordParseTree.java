@@ -46,7 +46,7 @@ public class StanfordParseTree {
 			// this is the parse tree of the current sentence
 	        Tree tree = sentence.get(TreeAnnotation.class);
 	        // This will not work now since we are expecting the list of seen words
-	        DFS dfs = new DFS(sentenceDao, rawSentence, new HashMap<Word.TextAndPosition, Word>());
+	        DFS dfs = new DFS(sentenceDao, null, rawSentence, new HashMap<Word.TextAndPosition, Word>());
 	        dfs.performDepthFirstTraversal(tree);
 	        System.out.println("Name of the class: " + tree.getClass().getName());
 	        System.out.println(tree);

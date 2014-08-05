@@ -8,6 +8,8 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import org.neo4j.graphdb.Node;
+import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.stanford.nlp.ling.CoreAnnotations.IndexAnnotation;
@@ -31,16 +33,23 @@ import edu.stanford.nlp.util.CoreMap;
 import edu.ucsd.dao.SentenceDao;
 import edu.ucsd.model.Document;
 import edu.ucsd.model.DocumentToSentence;
+import edu.ucsd.model.Rel;
 import edu.ucsd.model.Sentence;
 import edu.ucsd.model.Word;
 import edu.ucsd.model.WordToWordDependency;
 
 public class DisneyParser {
 	private SentenceDao sentenceDao;
+	private Neo4jTemplate template;
 	
 	@Inject
 	public void setSentenceDao(SentenceDao sentenceDao) {
 		this.sentenceDao = sentenceDao;
+	}
+	
+	@Inject
+	public void setTemplate(Neo4jTemplate template) {
+		this.template = template;
 	}
 
 	@Transactional
@@ -75,13 +84,16 @@ public class DisneyParser {
 		
 			for(CoreMap sentence: sentences) {
 				int wordIndex = 0; 
-
+				
 				// Maintain a list of words that has already been seen
 				Map<Word.TextAndPosition, Word> seenWords = new HashMap<Word.TextAndPosition, Word>();
 				Word root = Word.newWord("ROOT", wordIndex);
 				wordIndex++;
 				
 				sentenceDao.save(root);
+				
+				Node prevNode = template.getNode(root.getId());
+				
 				seenWords.put(root.getTextAndPosition(), root);
 				
 				Sentence newSentence = Sentence.newSentence(sentence.get(TextAnnotation.class), noSentence);
@@ -101,6 +113,11 @@ public class DisneyParser {
 					newWord.setPosTag(pos);
 					sentenceDao.save(newWord);
 					
+					Node currNode = template.getNode(newWord.getId());
+					template.createRelationshipBetween(prevNode, currNode, Rel.NEXT.name(), new HashMap<String, Object>());
+					
+					prevNode = currNode;
+					
 					seenWords.put(newWord.getTextAndPosition(), newWord);
 					
 					newSentence.addWord(newWord);
@@ -109,6 +126,9 @@ public class DisneyParser {
 				}
 				
 				sentenceDao.save(newSentence);
+				
+				Node sentenceNode = template.getNode(newSentence.getId());
+				template.createRelationshipBetween(sentenceNode, template.getNode(root.getId()), Rel.FIRST_CHILD.name(), new HashMap<String, Object>());
 				
 				// traversing the words in the current sentence
 				// a CoreLabel is a CoreMap with additional token-specific methods

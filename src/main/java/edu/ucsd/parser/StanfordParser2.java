@@ -42,7 +42,7 @@ public class StanfordParser2 {
 		
 		List<String> disneyFinancialStatement = FileUtils.readDisneyFinancialStatement("DFS.txt");	
 		DisneyParser parser = injector.getInstance(DisneyParser.class);
-		parser.parseAndLoad(disneyFinancialStatement.subList(0, 1), new Document("Disney Financial Statement", 2013, 0));
+		parser.parseAndLoad(disneyFinancialStatement, new Document("Disney Financial Statement", 2013, 0));
 		
 		stopWatch.stop();
 		logger.info(stopWatch.prettyPrint());

@@ -10,9 +10,13 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.traversal.Evaluators;
+import org.neo4j.graphdb.Path;
+import org.neo4j.graphdb.PathExpander;
+import org.neo4j.graphdb.traversal.TraversalDescription;
+import org.neo4j.kernel.OrderedByTypeExpander;
 import org.neo4j.kernel.Traversal;
 
 import com.google.inject.Guice;
@@ -100,11 +104,11 @@ public class SingleSentenceParseAndLoadTest {
 	private void checkParseTree(Sentence sentence, String expected) {
 		Node node = graphService.getNodeById(sentence.getId());
 		List<String> pathInStrings = new ArrayList<String>();
-		for ( Node pathNode : Traversal.description().depthFirst()
-			    .depthFirst()
-			    .relationships( Rel.HAS_PARSE_CHILD )
-			    .evaluator( Evaluators.toDepth( 15 ) )
-			    .traverse( node ).nodes() ) {
+		PathExpander<?> expander = new OrderedByTypeExpander().add(Rel.FIRST_CHILD, Direction.OUTGOING).add(Rel.NEXT, Direction.OUTGOING);
+		TraversalDescription DFS_TRAVERSAL = Traversal.description()
+			    .depthFirst().expand(expander);
+		for(Path path : DFS_TRAVERSAL.traverse(node)) {
+			Node pathNode = path.endNode();
 			if(pathNode.hasProperty("value")) {
 				pathInStrings.add(pathNode.getProperty("value").toString());	
 			} else if(pathNode.hasProperty("text")) {

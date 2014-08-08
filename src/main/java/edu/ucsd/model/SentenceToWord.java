@@ -50,8 +50,7 @@ public class SentenceToWord {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((sentence == null) ? 0 : sentence.hashCode());
+		result = prime * result + ((sentence == null) ? 0 : sentence.hashCode());
 		result = prime * result + ((word == null) ? 0 : word.hashCode());
 		return result;
 	}
@@ -77,4 +76,6 @@ public class SentenceToWord {
 			return false;
 		return true;
 	}
+
+	
 }

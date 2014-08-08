@@ -44,6 +44,7 @@
 	<bean name="parser" class="edu.ucsd.parser.DisneyParser"/>
 	<bean name="commonAncestor" class="edu.ucsd.processing.CommonAncestor"/>
 	<bean name="processingMain" class="edu.ucsd.processing.ProcessingMain"/>
+	<bean name="dfsNeo4J" class="edu.ucsd.parser.DFSNeo4J"/>
 	
 	<!-- Mappers -->
 	<bean name="mappingUtil" class="edu.ucsd.processing.MappingUtil">

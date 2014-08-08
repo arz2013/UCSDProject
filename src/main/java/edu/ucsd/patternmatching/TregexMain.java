@@ -17,12 +17,12 @@ public class TregexMain {
 	public static void main(String[] args) throws IOException {
 		String result = FileUtils.readFileToString(new File(TregexMain.class.getClassLoader().getResource("SingleParseTree.txt").getFile()));
 		Tree t = Tree.valueOf(result);
-		TregexPattern p = TregexPattern.compile("NP < (DT $+ NNP $+ NNP $+ NNP $+ NNP)");
+		TregexPattern p = TregexPattern.compile("NP < (DT . NNP . NNP . NNP . NNP)");
 		TregexMatcher m = p.matcher(t);
 		while (m.find()) {
 			m.getMatch().pennPrint();
 		}
-		p = TregexPattern.compile("NP < (DT $+ NNP=organization)");
+		p = TregexPattern.compile("NP < (DT $. NNP)");
 		m = p.matcher(t);
 		while (m.find()) {
 			m.getMatch().pennPrint();

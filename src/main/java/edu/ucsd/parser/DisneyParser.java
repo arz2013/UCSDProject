@@ -114,7 +114,7 @@ public class DisneyParser {
 					sentenceDao.save(newWord);
 					
 					Node currNode = template.getNode(newWord.getId());
-					//template.createRelationshipBetween(prevNode, currNode, Rel.NEXT.name(), new HashMap<String, Object>());
+					template.createRelationshipBetween(prevNode, currNode, Rel.NEXT_WORD.name(), new HashMap<String, Object>());
 					
 					prevNode = currNode;
 					
@@ -128,7 +128,7 @@ public class DisneyParser {
 				sentenceDao.save(newSentence);
 				
 				Node sentenceNode = template.getNode(newSentence.getId());
-				//template.createRelationshipBetween(sentenceNode, template.getNode(root.getId()), Rel.FIRST_CHILD.name(), new HashMap<String, Object>());
+				template.createRelationshipBetween(sentenceNode, template.getNode(root.getId()), Rel.FIRST_WORD.name(), new HashMap<String, Object>());
 				
 				// traversing the words in the current sentence
 				// a CoreLabel is a CoreMap with additional token-specific methods

@@ -1,7 +1,10 @@
 package edu.ucsd.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.annotation.TypeAlias;
@@ -80,6 +83,24 @@ public class Sentence {
 	
 	public Set<SentenceToWord> getSentenceToWords() {
 		return this.words;
+	}
+	
+	public List<Word> getWordsInOrder() {
+		List<Word> results = new ArrayList<Word>(this.words.size());
+		for(SentenceToWord word: words) {
+			results.add(word.getWord());
+		}
+		
+		Collections.sort(results, new Comparator<Word>() {
+
+			@Override
+			public int compare(Word w1, Word w2) {
+				return new Integer(w1.getPosition()).compareTo(w2.getPosition());
+			}
+			
+		});
+		
+		return results;
 	}
 
 	@Override

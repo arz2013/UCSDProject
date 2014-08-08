@@ -1,5 +1,5 @@
 package edu.ucsd.model;
 
 public enum NeTags {
-	ORGANIZATION, PERSON
+	ORGANIZATION, PERSON, MONEY;
 }

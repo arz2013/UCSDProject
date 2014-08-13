@@ -1,55 +1,73 @@
 package edu.ucsd.parser;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.context.ApplicationContext;
+import org.apache.log4j.Logger;
+import org.springframework.util.StopWatch;
 
+import edu.stanford.nlp.dcoref.CorefChain;
+import edu.stanford.nlp.dcoref.CorefChain.CorefMention;
+import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
-import edu.stanford.nlp.util.CoreMap;
-import edu.ucsd.dao.SentenceDao;
-import edu.ucsd.model.Sentence;
-import edu.ucsd.model.Word;
-import edu.ucsd.system.SystemApplicationContext;
 
 public class StanfordParseTree {
+	private static Logger logger = Logger.getLogger(StanfordParseTree.class);
 
 	public static void main(String[] args) {
-		ApplicationContext appContext = SystemApplicationContext.getApplicationContext();
-		SentenceDao sentenceDao = SentenceDao.class.cast(appContext.getBean("sentenceDao")); 
-
 		Properties props = new Properties();
-		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
-		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-		
-		String text = "My dog also likes eating sausage.";
-		
-		Sentence rawSentence = Sentence.newSentence(text, 0);
-		sentenceDao.save(rawSentence);
+        props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+        props.put("dcoref.score", true);
+        
+        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+        StopWatch sw = new StopWatch("Annotate and Resolove coreferences");
+        sw.start();
+        Annotation document = new Annotation("The atom is a basic unit of matter, it consists of a dense central nucleus surrounded by a cloud of negatively charged electrons.");
 
-		// create an empty Annotation just with the given text
-		Annotation document = new Annotation(text);
+        pipeline.annotate(document);
+        Map<Integer, CorefChain> coref = document.get(CorefChainAnnotation.class);
+        if(coref != null) {
+        	for(Map.Entry<Integer, CorefChain> entry : coref.entrySet()) {
+        		CorefChain c = entry.getValue();
+        		//this is because it prints out a lot of self references which aren't that useful
+        		
+        		if(c.getMentionsInTextualOrder().size() <= 1)
+        			continue;
+				
+        		CorefMention cm = c.getRepresentativeMention();
+        		
+        		String clust = "";
+        		List<CoreLabel> tks = document.get(SentencesAnnotation.class).get(cm.sentNum-1).get(TokensAnnotation.class);
+        		logger.info("Start Index: " + cm.startIndex + " End Index: " + cm.endIndex);
+        		for(int i = cm.startIndex-1; i < cm.endIndex-1; i++) {
+        			clust += tks.get(i).get(TextAnnotation.class) + " ";
+        		}
+        		clust = clust.trim();
+        		logger.info("representative mention: \"" + clust + "\" is mentioned by:");
 
-		// run all Annotators on this text
-		pipeline.annotate(document);
-		
-		// these are all the sentences in this document
-		// a CoreMap is essentially a Map that uses class objects as keys and has values with custom types
-		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-
-		for(CoreMap sentence: sentences) {
-			// this is the parse tree of the current sentence
-	        Tree tree = sentence.get(TreeAnnotation.class);
-	        // This will not work now since we are expecting the list of seen words
-	        DFS dfs = new DFS(sentenceDao, null, rawSentence, new HashMap<Word.TextAndPosition, Word>());
-	        dfs.performDepthFirstTraversal(tree);
-	        System.out.println("Name of the class: " + tree.getClass().getName());
-	        System.out.println(tree);
-		}
+        		for(CorefMention m : c.getMentionsInTextualOrder()) {
+        			String clust2 = "";
+        			tks = document.get(SentencesAnnotation.class).get(m.sentNum-1).get(TokensAnnotation.class);
+        			for(int i = m.startIndex-1; i < m.endIndex-1; i++)
+        				clust2 += tks.get(i).get(TextAnnotation.class) + " ";
+        			clust2 = clust2.trim();
+        			//don't need the self mention
+        			
+        			if(clust.equals(clust2))
+        				continue;
+					
+        			logger.info("\t" + clust2);
+        		}
+        	}
+        }
+        sw.stop();
+        logger.info(sw.prettyPrint());
 	}
 }
+	

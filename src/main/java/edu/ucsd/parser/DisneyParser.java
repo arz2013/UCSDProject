@@ -35,6 +35,7 @@ import edu.ucsd.model.Document;
 import edu.ucsd.model.DocumentToSentence;
 import edu.ucsd.model.Rel;
 import edu.ucsd.model.Sentence;
+import edu.ucsd.model.SpecialTokens;
 import edu.ucsd.model.Word;
 import edu.ucsd.model.WordToWordDependency;
 
@@ -67,6 +68,7 @@ public class DisneyParser {
 		int noSentence = 0;
 
 		for(String text : disneyFinancialStatement) {
+			System.out.println(text);
 			// create an empty Annotation just with the given text
 			Annotation document = new Annotation(text);
 
@@ -76,7 +78,7 @@ public class DisneyParser {
 			// these are all the sentences in this document
 			// a CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 			List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-				
+			
 			if(sentences.size() > 1) {
 				// An example: Walt Disney famously said, “Disneyland will never be completed. It will continue to grow as long as there is imagination left in the world.”
 				System.out.println("Sentence with 2 coremaps: " + text);
@@ -87,7 +89,7 @@ public class DisneyParser {
 				
 				// Maintain a list of words that has already been seen
 				Map<Word.TextAndPosition, Word> seenWords = new HashMap<Word.TextAndPosition, Word>();
-				Word root = Word.newWord("ROOT", wordIndex);
+				Word root = Word.newWord(SpecialTokens.ROOT.name(), wordIndex);
 				wordIndex++;
 				
 				sentenceDao.save(root);

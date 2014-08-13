@@ -1,5 +1,8 @@
 package edu.ucsd.patternmatching;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,10 +24,24 @@ public class DocumentSentenceFiltering {
 		Document doc = sentenceDao.getDocumentByTitleYearAndNumber("Disney Financial Statement", 2013, 0);
 		List<Sentence> sentences = sentenceDao.getSentencesBasedOnDocument(doc.getId());
 		SentenceFilter sentenceFilter = new SentenceFilter(sentenceDao);
+		List<Sentence> matchingSentences = new ArrayList<Sentence>();
 		for(Sentence sentence : sentences) {
 			if(sentenceFilter.match(sentence)) {
-				logger.info(sentence.getText());
+				matchingSentences.add(sentence);
 			}
+		}
+		
+		Collections.sort(matchingSentences, new Comparator<Sentence>() {
+
+			@Override
+			public int compare(Sentence s1, Sentence s2) {
+				return new Integer(s1.getSentenceNumber()).compareTo(s2.getSentenceNumber());
+			}
+			
+		});
+		
+		for(Sentence sentence : matchingSentences) {
+			logger.info(sentence.getId() + ", " + sentence.getSentenceNumber() + ", " + sentence.getText());
 		}
 	}
 

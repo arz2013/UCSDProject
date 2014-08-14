@@ -32,4 +32,7 @@ public interface SentenceRepository extends GraphRepository<Sentence> {
 
 	@Query("start s = node:__types__(className=\"_Sentence\"), w = node:__types__(className=\"_Word\") match (s)-[:HAS_WORD]->(w) where w.text <> \"ROOT\" and w.neTag = {0} return s.sNum as sentenceNumber, collect(w) as words")
 	public Iterable<Map<String, Object>> getWordsKeyedBySentenceNumberWithSpecificNeTag(NeTags neTag);
+
+	@Query("start s=node:__types__(className=\"_Sentence\"), w=node:__types__(className=\"_Word\") match (s)-[:HAS_WORD]->(w) where s.sNum = {0} and w.position = {1} return w;")
+	public Node getWord(int sentenceNumber, int startIndex);
 }

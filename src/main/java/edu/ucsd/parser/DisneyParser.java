@@ -8,7 +8,10 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import org.neo4j.graphalgo.impl.ancestor.AncestorsUtil;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
+import org.neo4j.kernel.Traversal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
@@ -176,21 +179,30 @@ public class DisneyParser {
 	        		CorefMention cm = c.getRepresentativeMention();
 	        		
 	        		String clust = "";
-	        		List<Node> words = sentenceDao.getWordsFromTo(cm.sentNum-1, cm.startIndex, cm.endIndex);
-	        		for(Node word: words) {
-	        			logger.info("Word Position: " + word.getProperty("position") + " Word text: " + word.getProperty("text"));
+	        		List<CoreLabel> tks = document.get(SentencesAnnotation.class).get(cm.sentNum-1).get(TokensAnnotation.class);
+	        		if(logger.isDebugEnabled()) {
+	        			logger.debug("Start Index: " + cm.startIndex + " End Index: " + cm.endIndex);
 	        		}
 	        		
-	        		List<CoreLabel> tks = document.get(SentencesAnnotation.class).get(cm.sentNum-1).get(TokensAnnotation.class);
-	        		
-	        		
-	        		logger.info("Start Index: " + cm.startIndex + " End Index: " + cm.endIndex);
 	        		for(int i = cm.startIndex-1; i < cm.endIndex-1; i++) {
 	        			clust += tks.get(i).get(TextAnnotation.class) + " ";
 	        		}
 	        		clust = clust.trim();
-	        		logger.info("representative mention: \"" + clust + "\" is mentioned by:");
-					
+	        		
+	        		if(logger.isDebugEnabled()) {
+	        			logger.debug("representative mention: \"" + clust + "\" is mentioned by:");
+	        		}
+	        		
+	        		Node representativeNode = getRepresentativeNode(cm.sentNum-1, cm.startIndex, cm.endIndex);
+	        		if(representativeNode != null) {
+	        			if(representativeNode.hasProperty("value")) {
+	        				logger.info("Rep Node Value : " + representativeNode.getProperty("value"));
+	        			} else {
+	        				logger.info("Rep Node Text : " + representativeNode.getProperty("text"));
+	        			}
+	        		} else {
+	        			logger.info("Repr Node is somehow null.");
+	        		}
 	        		for(CorefMention m : c.getMentionsInTextualOrder()) {
 	        			String clust2 = "";
 	        			tks = document.get(SentencesAnnotation.class).get(m.sentNum-1).get(TokensAnnotation.class);
@@ -201,13 +213,36 @@ public class DisneyParser {
 	        			
 	        			if(clust.equals(clust2))
 	        				continue;
-						
+					
+	        			// Not a self reference
+	        			Node mention = getRepresentativeNode(m.sentNum-1, m.startIndex, m.endIndex);
+	        			if(mention != null) {
+	        				if(mention.hasProperty("text")) {
+	        					logger.info("Mention : " + mention.getProperty("text"));
+	        				} else {
+	        					logger.info("Mention : " + mention.getProperty("value"));
+	        				}
+	        			}
 	        			logger.info("\t" + clust2);
 	        		}
 	        		
 	        	}
 	        } // if (coreref is not null)
 		} // for (String text: ) 
+	}
+	
+	private Node getRepresentativeNode(int sentenceNumber, int startIndex, int endIndex) {
+		if(endIndex != (startIndex + 1)) {
+			List<Node> reprMention = sentenceDao.getWordsFromTo(sentenceNumber, startIndex, endIndex);
+		
+			for(Node word: reprMention) {
+				logger.info("Word Position: " + word.getProperty("position") + " Word text: " + word.getProperty("text"));
+			}
+		
+			return AncestorsUtil.lowestCommonAncestor(reprMention, Traversal.expanderForTypes(Rel.HAS_PARSE_CHILD, Direction.INCOMING));
+		}
+		
+		return sentenceDao.getWord(sentenceNumber, startIndex);
 	}
 	
 	private Word getWord(TreeGraphNode node, Map<Word.TextAndPosition, Word> seenWords) {

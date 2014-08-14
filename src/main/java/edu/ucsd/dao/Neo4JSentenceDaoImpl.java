@@ -151,4 +151,9 @@ public class Neo4JSentenceDaoImpl implements SentenceDao {
 			int wordPositionTo) {
 		return this.repository.getWordsFromTo(sentenceNumber, wordPositionFrom, wordPositionTo);
 	}
+
+	@Override
+	public Node getWord(int sentenceNumber, int startIndex) {
+		return this.repository.getWord(sentenceNumber, startIndex);
+	}
 }

@@ -9,9 +9,14 @@ import java.util.Properties;
 import javax.inject.Inject;
 
 import org.neo4j.graphdb.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import edu.stanford.nlp.dcoref.CorefChain;
+import edu.stanford.nlp.dcoref.CorefChain.CorefMention;
+import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.IndexAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
@@ -40,6 +45,8 @@ import edu.ucsd.model.Word;
 import edu.ucsd.model.WordToWordDependency;
 
 public class DisneyParser {
+	private static Logger logger = LoggerFactory.getLogger(DisneyParser.class);
+	
 	private SentenceDao sentenceDao;
 	private Neo4jTemplate template;
 	
@@ -60,7 +67,8 @@ public class DisneyParser {
 		}
 		
 		Properties props = new Properties();
-		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
+		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+		props.put("dcoref.score", true);
 		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 		
 		sentenceDao.save(doc);
@@ -68,7 +76,6 @@ public class DisneyParser {
 		int noSentence = 0;
 
 		for(String text : disneyFinancialStatement) {
-			System.out.println(text);
 			// create an empty Annotation just with the given text
 			Annotation document = new Annotation(text);
 
@@ -78,11 +85,6 @@ public class DisneyParser {
 			// these are all the sentences in this document
 			// a CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 			List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-			
-			if(sentences.size() > 1) {
-				// An example: Walt Disney famously said, “Disneyland will never be completed. It will continue to grow as long as there is imagination left in the world.”
-				System.out.println("Sentence with 2 coremaps: " + text);
-			}
 		
 			for(CoreMap sentence: sentences) {
 				int wordIndex = 0; 
@@ -160,7 +162,52 @@ public class DisneyParser {
 				noSentence++;
 				seenWords.clear();
 			}
-		}
+			
+			// Process coreference
+			Map<Integer, CorefChain> coref = document.get(CorefChainAnnotation.class);
+	        if(coref != null) {
+	        	for(Map.Entry<Integer, CorefChain> entry : coref.entrySet()) {
+	        		CorefChain c = entry.getValue();
+	        		//this is because it prints out a lot of self references which aren't that useful
+	        		
+	        		if(c.getMentionsInTextualOrder().size() <= 1)
+	        			continue;
+					
+	        		CorefMention cm = c.getRepresentativeMention();
+	        		
+	        		String clust = "";
+	        		List<Node> words = sentenceDao.getWordsFromTo(cm.sentNum-1, cm.startIndex, cm.endIndex);
+	        		for(Node word: words) {
+	        			logger.info("Word Position: " + word.getProperty("position") + " Word text: " + word.getProperty("text"));
+	        		}
+	        		
+	        		List<CoreLabel> tks = document.get(SentencesAnnotation.class).get(cm.sentNum-1).get(TokensAnnotation.class);
+	        		
+	        		
+	        		logger.info("Start Index: " + cm.startIndex + " End Index: " + cm.endIndex);
+	        		for(int i = cm.startIndex-1; i < cm.endIndex-1; i++) {
+	        			clust += tks.get(i).get(TextAnnotation.class) + " ";
+	        		}
+	        		clust = clust.trim();
+	        		logger.info("representative mention: \"" + clust + "\" is mentioned by:");
+					
+	        		for(CorefMention m : c.getMentionsInTextualOrder()) {
+	        			String clust2 = "";
+	        			tks = document.get(SentencesAnnotation.class).get(m.sentNum-1).get(TokensAnnotation.class);
+	        			for(int i = m.startIndex-1; i < m.endIndex-1; i++)
+	        				clust2 += tks.get(i).get(TextAnnotation.class) + " ";
+	        			clust2 = clust2.trim();
+	        			//don't need the self mention
+	        			
+	        			if(clust.equals(clust2))
+	        				continue;
+						
+	        			logger.info("\t" + clust2);
+	        		}
+	        		
+	        	}
+	        } // if (coreref is not null)
+		} // for (String text: ) 
 	}
 	
 	private Word getWord(TreeGraphNode node, Map<Word.TextAndPosition, Word> seenWords) {

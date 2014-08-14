@@ -26,9 +26,9 @@ public class StanfordParseTree {
         props.put("dcoref.score", true);
         
         StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-        StopWatch sw = new StopWatch("Annotate and Resolove coreferences");
+        StopWatch sw = new StopWatch("Annotate and Resolve coreferences");
         sw.start();
-        Annotation document = new Annotation("The atom is a basic unit of matter, it consists of a dense central nucleus surrounded by a cloud of negatively charged electrons.");
+        Annotation document = new Annotation("If they are angry about the music, the neighbors will call the cops.");
 
         pipeline.annotate(document);
         Map<Integer, CorefChain> coref = document.get(CorefChainAnnotation.class);

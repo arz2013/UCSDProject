@@ -45,8 +45,8 @@ public class SingleSentenceParseAndLoadTest {
 		text = "Looking back at everything we’ve accomplished this year, I am once again awed by the tremendous creativity and commitment of the men and women who make up The Walt Disney Company.";
 		text1 = "On behalf of everyone at Disney, I thank you for your continued support as we strive to create the next generation of fantastic family entertainment.";
 		List<String> disneyFinancialStatement = new ArrayList<String>();
-		disneyFinancialStatement.add(text);
-		disneyFinancialStatement.add(text1);
+		disneyFinancialStatement.add(text + " " + text1);
+		// disneyFinancialStatement.add(text1);
 		DisneyParser parser = injector.getInstance(DisneyParser.class);
 		parser.parseAndLoad(disneyFinancialStatement, new Document("Disney Financial Statement", 2013, 0));
 	}

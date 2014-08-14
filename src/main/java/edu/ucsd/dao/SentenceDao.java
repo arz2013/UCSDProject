@@ -34,6 +34,7 @@ public interface SentenceDao {
 	public List<Sentence> getSentencesBasedOnDocument(Long documentId);
 	public List<Word> getWordsWithNeTag(String neTag);
 	public Iterable<SentenceNumberAndWords> getWordsKeyedBySentenceNumberWithSpecificNeTag(NeTags neTag);
+	public List<Node> getWordsFromTo(int sentenceNumber, int wordPositionFrom, int wordPositionTo);
 	
 	public static class SentenceNumberAndWords {
 		private int sentenceNumber;

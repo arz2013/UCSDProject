@@ -222,6 +222,7 @@ public class DisneyParser {
 	        				} else {
 	        					logger.info("Mention : " + mention.getProperty("value"));
 	        				}
+	        				template.createRelationshipBetween(mention, representativeNode, Rel.REFERS_TO.name(), new HashMap<String, Object>());
 	        			}
 	        			logger.info("\t" + clust2);
 	        		}

@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -15,6 +18,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.PathExpander;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.kernel.OrderedByTypeExpander;
 import org.neo4j.kernel.Traversal;
@@ -56,8 +61,34 @@ public class SingleSentenceParseAndLoadTest {
 		validateDocument();
 		validateFirstSentence();
 		validateSecondSentence();
+		validateReference();
 	}
 	
+	private void validateReference() {
+		// TODO Auto-generated method stub
+		Sentence sentence = sentenceDao.getSentenceByText(text1);
+		Node word = sentenceDao.getWord(sentence.getSentenceNumber(), 6);
+		Assert.assertEquals(word.getProperty("text"), "Disney");
+		int count = 0; 
+		Node nounPhrase = null;
+		for(Relationship rel : word.getRelationships(Rel.REFERS_TO, Direction.OUTGOING)) {
+			count++;
+			nounPhrase = rel.getEndNode();
+		}
+		Assert.assertEquals(count, 1);
+		Assert.assertEquals(nounPhrase.getProperty("value"), "NP");
+		Set<String> children = new HashSet<String>();
+		for(Relationship rel : nounPhrase.getRelationships(Rel.HAS_PARSE_CHILD, Direction.OUTGOING)) {
+			Node leafWord = rel.getEndNode().getRelationships(Rel.HAS_PARSE_CHILD, Direction.OUTGOING).iterator().next().getEndNode();
+			children.add((String)leafWord.getProperty("text"));
+		}
+		Assert.assertEquals(children.size(), 4);
+		Assert.assertTrue(children.contains("The"));
+		Assert.assertTrue(children.contains("Walt"));
+		Assert.assertTrue(children.contains("Disney"));
+		Assert.assertTrue(children.contains("Company"));
+	}
+
 	private void validateDocument() {
 		Document doc = sentenceDao.getDocumentByTitleYearAndNumber("Disney Financial Statement", 2013, 0);
 		Assert.assertNotNull(doc);
